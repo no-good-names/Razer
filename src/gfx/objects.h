@@ -7,13 +7,14 @@
 
 #include "math/maths.h"
 #include "typedef.h"
-#include "prim.h"
+#include "primitives.h"
 
 typedef struct {
 	v3_t *vertices;
 	iv3_t *triangles;
 	int numVertices;
 	int numTriangles;
+	v3_t center;
 	uint32_t *color;
 } Object_t;
 
@@ -22,9 +23,15 @@ typedef struct {
 	int numObjects;
 } Scene_t;
 
-Object_t create_object(v3_t *vertices, iv3_t *triangles, int numVertices, int numTriangles, uint32_t *color);
+typedef struct {
+	float scale;
+	v3_t rotation;
+	v3_t translation;
+} Transformations_t;
+
+Object_t create_object(v3_t POS, v3_t *vertices, iv3_t *triangles, int numVertices, int numTriangles, uint32_t *color);
 Scene_t create_scene(Object_t *objects, int numObjects);
 
-void transform_object(Object_t object, mat4_t transform);
+void translate_object(Object_t object, v3_t translation);
 
 #endif //OBJECTS_H

@@ -7,6 +7,13 @@
 #include <math.h>
 #include <stdlib.h>
 
+v2_t v2_sub(const v2_t a, const v2_t b) {
+	return (v2_t) {
+		.x = a.x - b.x,
+		.y = a.y - b.y
+	};
+}
+
 // add two vectors
 v3_t v3_add(const v3_t a, const v3_t b) {
 	return (v3_t) {
@@ -83,4 +90,10 @@ v2_t v2_lerp(v2_t a, v2_t b, float t) {
 		.x = lerp(a.x, b.x, t),
 		.y = lerp(a.y, b.y, t)
 	};
+}
+
+void mat4_translate(mat4x4_t matrix, const v3_t translation) {
+	matrix[0][3] = translation.x;
+	matrix[1][3] = translation.y;
+	matrix[2][3] = translation.z;
 }

@@ -17,13 +17,15 @@ set(LIBS ${LIBS} ${SDL2_LIBRARIES} m)
 add_executable(Razer
         src/main.c
         src/gfx/typedef.h
-        src/gfx/prim.c
-        src/gfx/prim.h
+        src/gfx/primitives.c
+        src/gfx/primitives.h
         src/gfx/math/maths.c
         src/gfx/math/maths.h
         src/gfx/objects.c
         src/gfx/objects.h
         src/gfx/gfx.h
+        src/gfx/camera.c
+        src/gfx/camera.h
 )
 
 target_link_libraries(Razer ${LIBS})

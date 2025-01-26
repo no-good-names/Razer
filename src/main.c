@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+#include "gfx/camera.h"
 #include "gfx/gfx.h"
 
 #define RENDER_WIREFRAME 1
@@ -13,11 +14,7 @@ struct {
 	SDL_Texture *texture;
 	uint32_t pixels[SCREEN_WIDTH * SCREEN_HEIGHT]; // viewport
 	bool running;
-	struct deltaTime {
-		uint32_t lastTime;
-		uint32_t currentTime;
-		float deltaTime;
-	} dt;
+	Camera_t camera;
 } state;
 
 v2_t ViewportToCanvas(const v2_t v) {
@@ -30,10 +27,10 @@ v2_t ViewportToCanvas(const v2_t v) {
 
 v2_t ProjectVertex(const v3_t v) {
 	if (v.z == 0.0f) {
-		printf("Error: Division by zero.\n");
+		fprintf(stderr, "Error: Division by zero.\n");
 		return (v2_t){0.0f, 0.0f};
 	}
-	float d = 1;
+	const float d = 1.0f; // depth
 	v2_t dv = {
 		(v.x * d) / v.z,
 		(v.y * d) / v.z
@@ -55,86 +52,79 @@ void setPixel(int32_t x, int32_t y, const uint32_t color) {
 	state.pixels[(y * SCREEN_WIDTH) + x] = color;
 }
 
-v3_t vertices[8] = {
-	{-2, -0.5f, 5.0f},
-	{-2, 0.5f, 5.0f},
-	{-1, 0.5f, 5.0f},
-	{-1, -0.5f, 5.0f},
-	{-2, -0.5f, 6.0f},
-	{-2, 0.5f, 6.0f},
-	{-1, 0.5f, 6.0f},
-	{-1, -0.5f, 6.0f}
+v3_t vertices[1][8] = {
+	{
+		{1, 1, 1},
+		{-1, 1, 1},
+		{-1, -1, 1},
+		{1, -1, 1},
+		{1, 1, -1},
+		{-1, 1, -1},
+		{-1, -1, -1},
+		{1, -1, -1}
+	}
 };
 
-v3_t vertices2[8] = {
-	{2, -0.5f, 5.0f},
-	{2, 0.5f, 5.0f},
-	{1, 0.5f, 5.0f},
-	{1, -0.5f, 5.0f},
-	{2, -0.5f, 6.0f},
-	{2, 0.5f, 6.0f},
-	{1, 0.5f, 6.0f},
-	{1, -0.5f, 6.0f}
+v3_t vertices2[1][5] = {
+	{
+		{-1, -1, 1},
+		{-1, -1, -1},
+		{1, -1, 1},
+		{1, -1, -1},
+		{ 0, 1, 0}
+	}
 };
 
-iv3_t triangles[12] = {
-	{0, 1, 2},
-	{0, 2, 3},
-	{4, 5, 6},
-	{4, 6, 7},
-	{0, 1, 5},
-	{0, 5, 4},
-	{1, 2, 6},
-	{1, 6, 5},
-	{2, 3, 7},
-	{2, 7, 6},
-	{3, 0, 4},
-	{3, 4, 7}
+iv3_t triangles[1][12] = {
+	{
+		{0, 1, 2},
+		{0, 2, 3},
+		{4, 0, 3},
+		{4, 3, 7},
+		{5, 4, 7},
+		{5, 7, 6},
+		{1, 5, 6},
+		{1, 6, 2},
+		{4, 5, 1},
+		{4, 1, 0},
+		{2, 6, 7},
+		{2, 7, 3}
+	}
 };
 
-iv3_t triangles2[12] = {
-	{0, 1, 2},
-	{0, 2, 3},
-	{4, 5, 6},
-	{4, 6, 7},
-	{0, 1, 5},
-	{0, 5, 4},
-	{1, 2, 6},
-	{1, 6, 5},
-	{2, 3, 7},
-	{2, 7, 6},
-	{3, 0, 4},
-	{3, 4, 7}
+iv3_t triangles2[1][6] = {
+	{
+		{0, 1, 4},
+		{0, 2, 4},
+		{2, 3, 4},
+		{4, 3, 4},
+		{1, 3, 4},
+		{1, 2, 3}
+	}
 };
 
 uint32_t colors[12] = {
-	0xFFFF0000,
-	0xFF00FF00,
-	0xFF0000FF,
-	0xFFFFFF00,
-	0xFFFF00FF,
-	0xFF00FFFF,
-	0xFF000000,
-	0xFFFFFFFF,
-	0xFF00FF00,
-	0xFF00FF00,
-	0xFF00FF00,
-	0xFF00FF00
+	RED,
+	RED,
+	GREEN,
+	GREEN,
+	BLUE,
+	BLUE,
+	YELLOW,
+	YELLOW,
+	PURPLE,
+	PURPLE,
+	CYAN,
+	CYAN
 };
 
-uint32_t colors2[12] = {
-	0xFFFF0000,
-	0xFF00FF00,
-	0xFF0000FF,
-	0xFFFFFF00,
-	0xFFFF00FF,
-	0xFF00FFFF,
-	0xFF000000,
-	0xFFFFFFFF,
-	0xFF00FF00,
-	0xFF00FF00,
-	0xFF00FF00,
-	0xFF00FF00
+uint32_t colors2[6] = {
+	RED,
+	GREEN,
+	BLUE,
+	YELLOW,
+	PURPLE,
+	CYAN
 };
 
 void renderTriangle(v2_t projected[3], uint32_t color) {
@@ -145,40 +135,53 @@ void renderTriangle(v2_t projected[3], uint32_t color) {
 #endif
 }
 
-void renderObject(const v3_t *vertices, const iv3_t *triangles, const int numVertices, const int numTriangles, const uint32_t color) {
-	v2_t *projectedVertices = malloc(numVertices * sizeof(v3_t));
-	for (int i = 0; i < numVertices; i++) {
-		projectedVertices[i] = ProjectVertex(vertices[i]);
+v3_t rotateX(v3_t v, float angle) {
+	float cosAngle = cosf(angle);
+	float sinAngle = sinf(angle);
+	return (v3_t) {
+		.x = v.x * cosAngle - v.z * sinAngle,
+		.y = v.y,
+		.z = v.x * sinAngle + v.z * cosAngle
+	};
+}
+
+void renderObject(Object_t object) {
+	static v2_t projectedVertices[MAX_OBJECT_VERTICES];
+	for (int i = 0; i < object.numVertices; i++) {
+		projectedVertices[i] = ProjectVertex(v3_add(object.vertices[i], v3_sub(object.center, state.camera.position)));
 	}
-	for (int i = 0; i < numTriangles; i++) {
-		iv3_t triangle = triangles[i];
-		v2_t *renderedTriangle = malloc(3 * sizeof(v2_t));
-		renderedTriangle[0] = projectedVertices[triangle.x];
-		renderedTriangle[1] = projectedVertices[triangle.y];
-		renderedTriangle[2] = projectedVertices[triangle.z];
-		renderTriangle(renderedTriangle, color);
-		free(renderedTriangle);
+	for (int i = 0; i < object.numTriangles; i++) {
+		v2_t renderedTriangle[3] = {
+			projectedVertices[object.triangles[i].x],
+			projectedVertices[object.triangles[i].y],
+			projectedVertices[object.triangles[i].z],
+		};
+		renderTriangle(renderedTriangle, object.color[i]);
 	}
-	free(projectedVertices);
 }
 
 void RenderScene(const Scene_t scene) {
 	for (int i = 0; i < scene.numObjects; i++) {
-		renderObject(scene.objects[i].vertices,
-			scene.objects[i].triangles,
-			scene.objects[i].numVertices,
-			scene.objects[i].numTriangles,
-			*scene.objects[i].color);
+		renderObject(scene.objects[i]);
 	}
 }
 
 void ClearScreen(uint32_t color) {
-	memset(state.pixels, 0, sizeof(state.pixels));
 	for (int y = -SCREEN_HEIGHT/2; y < SCREEN_HEIGHT / 2; y++) {
 		for (int x = -SCREEN_WIDTH/2; x < SCREEN_WIDTH/2; x++) {
 			setPixel(x, y, color);
 		}
 	}
+}
+
+bool keywait(int miliseconds) {
+	static int lastTime = 0;
+	int currentTime = SDL_GetTicks();
+	if(currentTime - lastTime > miliseconds) {
+		lastTime = currentTime;
+		return true;
+	}
+	return false;
 }
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
@@ -187,16 +190,23 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     state.texture = SDL_CreateTexture(state.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     state.running = true;
-    state.dt.lastTime = SDL_GetTicks();
-    state.dt.currentTime = 0;
-    state.dt.deltaTime = 0;
-	Object_t cube = create_object(vertices, triangles, 8, 12, colors);
-	Object_t cube2 = create_object(vertices2, triangles2, 8, 12, colors);
-	Object_t *objects = malloc(2 * sizeof(Object_t));
-	objects[0] = cube;
-	objects[1] = cube2;
-	Scene_t scene = create_scene(objects, 2);
+
+	state.camera = create_camera((v3_t) {0, 0, 0}, (v3_t) {1, 0, 0});
+
+	// Test Scene
+	Object_t objects[1] = {
+		create_object((v3_t) {0, 0, 8}, vertices[0], triangles[0], 8, 12, colors)
+	};
+
+	Object_t objects2[1] = {
+		create_object((v3_t) {0, 0, 8}, vertices2[0], triangles2[0], 5, 6, colors2)
+	};
+
+	Scene_t scene = create_scene(objects, 1);
+	Scene_t scene2 = create_scene(objects2, 1);
+	int i = 0;
     while (state.running) {
+    	// SDL2 events
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
@@ -205,15 +215,43 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
             }
         }
 
-        // Movement
-        const uint8_t *keys = SDL_GetKeyboardState(NULL);
-        if (keys[SDL_SCANCODE_W]) {
-        	printf("Test");
+        // Inputs
+    	const uint8_t *keys = SDL_GetKeyboardState(NULL);
+    	if (keys[SDL_SCANCODE_W] && keywait(10)) {
+    		if (state.camera.position.z < 6) {
+				state.camera.position.z += 0.1f;
+			}
+    		else {
+    			fprintf(stderr, "Program will crash beyond this point, I need to fix it.\n");
+    		}
+    	}
+    	if (keys[SDL_SCANCODE_S] && keywait(10)) {
+    		state.camera.position.z -= 0.1f;
+    	}
+        if (keys[SDL_SCANCODE_D] && keywait(10)) {
+        	state.camera.position.x += 0.1f;
         }
+    	if (keys[SDL_SCANCODE_A] && keywait(10)) {
+    		state.camera.position.x -= 0.1f;
+    	}
+    	if (keys[SDL_SCANCODE_1] && keywait(10)) {
+    		i = 0;
+		}
+    	if (keys[SDL_SCANCODE_2] && keywait(10)) {
+    		i = 1;
+    	}
 
-        ClearScreen(0xFFFFFFFF);
-    	RenderScene(scene);
+    	// Rendering
+    	memset(state.pixels, 0, sizeof(state.pixels)); // clear buffer
+        ClearScreen(0);
+    	if (i == 0) {
+			RenderScene(scene);
+		}
+		if (i == 1) {
+			RenderScene(scene2);
+		}
 
+		// Update screen
         SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREEN_WIDTH * sizeof(state.pixels[0]));
         SDL_RenderCopyEx(
             state.renderer,

@@ -5,11 +5,10 @@
 #ifndef GFX_H
 #define GFX_H
 
-
 #include "math/maths.h"
 #include "typedef.h"
 #include "objects.h"
-#include "prim.h"
-
+#include "primitives.h"
+#include "camera.h"
 
 #endif //GFX_H

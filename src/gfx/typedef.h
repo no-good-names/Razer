@@ -24,11 +24,12 @@
 #define VIEWPORT_WIDTH 1.0f
 #define VIEWPORT_HEIGHT (VIEWPORT_WIDTH * (float) SCREEN_HEIGHT / SCREEN_WIDTH)
 
+#define XOUT_OF_BOUNDS SCREEN_WIDTH + 1
+#define YOUT_OF_BOUNDS SCREEN_HEIGHT + 1
+
 #define ASSERT(condition, message) if (!(condition)) { fprintf(stderr, "Assertion failed: %s\n", message); return 1; }
 #define DEPRECATED(message) __attribute__((deprecated(message)))
 #define RGB(r, g, b) (uint32_t) ((255 << 24) | (r << 16) | (g << 8) | b)
-#define ABS(_x) ( (_x) < 0 ? -(_x) : (_x) )
-#define MAX(_x, _y) ( (_x) > _y ? (_x)-1 : (_x) )
 
 #define swap(a, b) \
 		{ \
@@ -41,11 +42,12 @@
 #define RED (uint32_t) 0xFFFF0000
 #define GREEN (uint32_t) 0xFF00FF00
 #define BLUE (uint32_t) 0xFF0000FF
+#define YELLOW (uint32_t) 0xFFFFFF00
+#define PURPLE (uint32_t) 0xFFFF00FF
+#define CYAN (uint32_t) 0xFF00FFFF
+#define WHITE (uint32_t) 0xFFFFFFFF
+#define BLACK (uint32_t) 0xFF000000
 
-#ifdef RENDER_WIREFRAME
-#define RENDER_WIREFRAME 1
-#else
-#define RENDER_WIREFRAME 0
-#endif
+#define MAX_OBJECT_VERTICES 1000
 
 #endif //TYPEDEF_H

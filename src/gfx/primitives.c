@@ -2,15 +2,20 @@
 // Created by cp176 on 1/24/2025.
 //
 
-#include "prim.h"
+#include "primitives.h"
 
 #include <math.h>
 
 void drawLine(void (setPixel)(int32_t x, int32_t y, uint32_t color), v2_t start, v2_t end, uint32_t color) {
+	if (start.x == end.x && start.y == end.y) {
+		setPixel(start.x, start.y, color);
+		return;
+	}
+
 	int x0 = (int)start.x, y0 = (int)start.y;
 	int x1 = (int)end.x, y1 = (int)end.y;
 
-	int dx = ABS(x1 - x0), dy = ABS(y1 - y0);
+	int dx = abs(x1 - x0), dy = abs(y1 - y0);
 	int sx = (x0 < x1) ? 1 : -1;
 	int sy = (y0 < y1) ? 1 : -1;
 	int err = dx - dy;
