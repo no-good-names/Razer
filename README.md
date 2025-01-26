@@ -2,6 +2,8 @@
 
 Razer is a simple rasterizer that renders 3D models.
 
+![screenshot](./assets/razer.png)
+
 ## Table of Contents
 
 - [Installation](#installation)
