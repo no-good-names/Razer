@@ -39,3 +39,14 @@ $ cmake -S . -B build -G "Ninja" # or any other generator
 ## Dependencies
 
 - [SDL2](https://www.libsdl.org/)
+
+
+## TODO List
+- [x] Add a simple rasterizer
+- [x] Add a simple 3D model renderer
+- [x] Add transformations
+- [x] Add a simple camera
+- [ ] Add better math library
+- [ ] Add clipping
+- [ ] Add a simple 3D model loader
+- [ ] Add shading and lighting

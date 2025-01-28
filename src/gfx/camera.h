@@ -10,9 +10,9 @@
 
 typedef struct {
 	v3_t position;
-	v3_t view_dir;
+	v2_t view_dir;
 } Camera_t;
 
-Camera_t create_camera(v3_t position, v3_t view_dir);
+Camera_t create_camera(v3_t position, v2_t view_dir);
 
 #endif //CAMERA_H

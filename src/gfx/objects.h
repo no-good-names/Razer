@@ -19,19 +19,27 @@ typedef struct {
 } Object_t;
 
 typedef struct {
-	Object_t *objects;
-	int numObjects;
-} Scene_t;
-
-typedef struct {
 	float scale;
 	v3_t rotation;
 	v3_t translation;
 } Transformations_t;
 
-Object_t create_object(v3_t POS, v3_t *vertices, iv3_t *triangles, int numVertices, int numTriangles, uint32_t *color);
-Scene_t create_scene(Object_t *objects, int numObjects);
+typedef struct {
+	Object_t object;
+	Transformations_t transformations;
+} Instance_t;
 
-void translate_object(Object_t object, v3_t translation);
+typedef struct {
+	Instance_t *instances;
+	int numInstances;
+} Scene_t;
+
+Object_t create_object(v3_t *vertices, iv3_t *triangles, int numVertices, int numTriangles, uint32_t *color);
+void create_instance(Instance_t *dest, Object_t object, Transformations_t transformations);
+Scene_t create_scene(Instance_t *instances, int numInstances);
+
+void apply_transformation(Instance_t *instance, const Transformations_t translation);
+void scale_object(Object_t object, float scale);
+void rotate_object(Object_t object, v3_t rotation);
 
 #endif //OBJECTS_H

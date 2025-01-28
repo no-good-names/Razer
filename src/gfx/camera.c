@@ -4,7 +4,7 @@
 
 #include "camera.h"
 
-Camera_t create_camera(v3_t position, v3_t view_dir) {
+Camera_t create_camera(const v3_t position, const v2_t view_dir) {
 	Camera_t camera = {
 		.position = position,
 		.view_dir = view_dir

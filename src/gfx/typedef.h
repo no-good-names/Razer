@@ -24,11 +24,9 @@
 #define VIEWPORT_WIDTH 1.0f
 #define VIEWPORT_HEIGHT (VIEWPORT_WIDTH * (float) SCREEN_HEIGHT / SCREEN_WIDTH)
 
-#define XOUT_OF_BOUNDS SCREEN_WIDTH + 1
-#define YOUT_OF_BOUNDS SCREEN_HEIGHT + 1
-
 #define ASSERT(condition, message) if (!(condition)) { fprintf(stderr, "Assertion failed: %s\n", message); return 1; }
 #define DEPRECATED(message) __attribute__((deprecated(message)))
+#define WARNING(message) __attribute__((warning(message)))
 #define RGB(r, g, b) (uint32_t) ((255 << 24) | (r << 16) | (g << 8) | b)
 
 #define swap(a, b) \
@@ -37,7 +35,6 @@
 			a = b; \
 			b = temp; \
 		}
-
 
 #define RED (uint32_t) 0xFFFF0000
 #define GREEN (uint32_t) 0xFF00FF00

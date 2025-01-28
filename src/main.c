@@ -17,27 +17,22 @@ struct {
 	Camera_t camera;
 } state;
 
-v2_t ViewportToCanvas(const v2_t v) {
-    v2_t canvas = {
-        .x = v.x * SCREEN_WIDTH / VIEWPORT_WIDTH,
-        .y = v.y * SCREEN_HEIGHT / VIEWPORT_HEIGHT
-    };
-    return canvas;
-}
-
-v2_t ProjectVertex(const v3_t v) {
-	if (v.z == 0.0f) {
-		fprintf(stderr, "Error: Division by zero.\n");
-		return (v2_t){0.0f, 0.0f};
+void ProjectToCanvas(iv2_t *dest, const v3_t v) {
+	if (v.z <= 0.0f) {
+		return;
 	}
 	const float d = 1.0f; // depth
+	// Perspective projection
 	v2_t dv = {
 		(v.x * d) / v.z,
 		(v.y * d) / v.z
 	};
 
-	dv = ViewportToCanvas(dv);
-	return dv;
+	// NOTE: THIS IS VIEWPORT TO CANVAS
+	*dest = (iv2_t) {
+		.x = dv.x * (SCREEN_WIDTH / VIEWPORT_WIDTH),
+		.y = dv.y * (SCREEN_HEIGHT / VIEWPORT_HEIGHT)
+	};
 }
 
 void setPixel(int32_t x, int32_t y, const uint32_t color) {
@@ -127,7 +122,7 @@ uint32_t colors2[6] = {
 	CYAN
 };
 
-void renderTriangle(v2_t projected[3], uint32_t color) {
+void renderTriangle(iv2_t projected[3], uint32_t color) {
 #if RENDER_WIREFRAME == 1
 	WireFrameTriangle(setPixel, projected[0], projected[1], projected[2], color);
 #else
@@ -135,23 +130,21 @@ void renderTriangle(v2_t projected[3], uint32_t color) {
 #endif
 }
 
-v3_t rotateX(v3_t v, float angle) {
-	float cosAngle = cosf(angle);
-	float sinAngle = sinf(angle);
-	return (v3_t) {
-		.x = v.x * cosAngle - v.z * sinAngle,
-		.y = v.y,
-		.z = v.x * sinAngle + v.z * cosAngle
-	};
+v3_t rotate_scene(v3_t v, v2_t rotation) {
+	v = rotateX(v, rotation.x);
+	v = rotateY(v, rotation.y);
+	v = rotateZ(v, 0);
+	return v;
 }
 
 void renderObject(Object_t object) {
-	static v2_t projectedVertices[MAX_OBJECT_VERTICES];
+	static iv2_t projectedVertices[MAX_OBJECT_VERTICES];
 	for (int i = 0; i < object.numVertices; i++) {
-		projectedVertices[i] = ProjectVertex(v3_add(object.vertices[i], v3_sub(object.center, state.camera.position)));
+		ProjectToCanvas(&projectedVertices[i], rotate_scene(v3_add(object.vertices[i],
+			v3_sub(object.center, state.camera.position)), state.camera.view_dir));
 	}
 	for (int i = 0; i < object.numTriangles; i++) {
-		v2_t renderedTriangle[3] = {
+		iv2_t renderedTriangle[3] = {
 			projectedVertices[object.triangles[i].x],
 			projectedVertices[object.triangles[i].y],
 			projectedVertices[object.triangles[i].z],
@@ -161,16 +154,8 @@ void renderObject(Object_t object) {
 }
 
 void RenderScene(const Scene_t scene) {
-	for (int i = 0; i < scene.numObjects; i++) {
-		renderObject(scene.objects[i]);
-	}
-}
-
-void ClearScreen(uint32_t color) {
-	for (int y = -SCREEN_HEIGHT/2; y < SCREEN_HEIGHT / 2; y++) {
-		for (int x = -SCREEN_WIDTH/2; x < SCREEN_WIDTH/2; x++) {
-			setPixel(x, y, color);
-		}
+	for (int i = 0; i < scene.numInstances; i++) {
+		renderObject(scene.instances[i].object);
 	}
 }
 
@@ -191,19 +176,28 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     state.texture = SDL_CreateTexture(state.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
     state.running = true;
 
-	state.camera = create_camera((v3_t) {0, 0, 0}, (v3_t) {1, 0, 0});
+	state.camera = create_camera((v3_t) {0, 0, 0}, (v2_t) {0, 0});
 
 	// Test Scene
-	Object_t objects[1] = {
-		create_object((v3_t) {0, 0, 8}, vertices[0], triangles[0], 8, 12, colors)
-	};
+	const Object_t square = create_object(vertices[0], triangles[0], 8, 12, colors);
+	const Object_t prism = create_object(vertices2[0], triangles2[0], 5, 6, colors2);
 
-	Object_t objects2[1] = {
-		create_object((v3_t) {0, 0, 8}, vertices2[0], triangles2[0], 5, 6, colors2)
-	};
+	Instance_t instances[1][2] = {0};
 
-	Scene_t scene = create_scene(objects, 1);
-	Scene_t scene2 = create_scene(objects2, 1);
+	create_instance(&instances[0][0], square, (Transformations_t) {
+		.scale = 1.0f,
+		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
+		.translation = (v3_t) {0, 0, 6}
+	});
+
+	create_instance(&instances[0][1], prism, (Transformations_t) {
+		.scale = 1.0f,
+		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
+		.translation = (v3_t) {0, 0, 6}
+	});
+
+	Scene_t scene = create_scene(&instances[0][0], 1);
+	Scene_t scene2 = create_scene(&instances[0][1], 1);
 	int i = 0;
     while (state.running) {
     	// SDL2 events
@@ -217,22 +211,47 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
         // Inputs
     	const uint8_t *keys = SDL_GetKeyboardState(NULL);
-    	if (keys[SDL_SCANCODE_W] && keywait(10)) {
-    		if (state.camera.position.z < 6) {
-				state.camera.position.z += 0.1f;
-			}
-    		else {
-    			fprintf(stderr, "Program will crash beyond this point, I need to fix it.\n");
-    		}
+    	if (keys[SDL_SCANCODE_W]) {
+    		// Move forward in the direction of the view
+    		v3_t forward = v3_normalize((v3_t) {
+				.x = sinf(state.camera.view_dir.x),
+				.y = sinf(state.camera.view_dir.y),
+				.z = cosf(state.camera.view_dir.x)
+			});
+    		state.camera.position = v3_add(state.camera.position, v3_scale(forward, 0.05f));
     	}
-    	if (keys[SDL_SCANCODE_S] && keywait(10)) {
-    		state.camera.position.z -= 0.1f;
+    	if (keys[SDL_SCANCODE_S]) {
+    		// Move backward opposite to the view direction
+    		v3_t backward = v3_normalize((v3_t) {
+				.x = sinf(state.camera.view_dir.x),
+				.y = sinf(state.camera.view_dir.y),
+				.z = cosf(state.camera.view_dir.x)
+			});
+    		state.camera.position = v3_sub(state.camera.position, v3_scale(backward, 0.05f));
     	}
-        if (keys[SDL_SCANCODE_D] && keywait(10)) {
-        	state.camera.position.x += 0.1f;
-        }
-    	if (keys[SDL_SCANCODE_A] && keywait(10)) {
-    		state.camera.position.x -= 0.1f;
+    	if (keys[SDL_SCANCODE_A]) {
+    		// Strafe left (perpendicular to the view direction)
+    		v3_t left = v3_normalize((v3_t) {
+				.x = sinf(state.camera.view_dir.x - M_PI_2),
+				.y = 0.0f,
+				.z = cosf(state.camera.view_dir.x - M_PI_2)
+			});
+    		state.camera.position = v3_add(state.camera.position, v3_scale(left, 0.05f));
+    	}
+    	if (keys[SDL_SCANCODE_D]) {
+    		// Strafe right (perpendicular to the view direction)
+    		v3_t right = v3_normalize((v3_t) {
+				.x = sinf(state.camera.view_dir.x + M_PI_2),
+				.y = 0.0f,
+				.z = cosf(state.camera.view_dir.x + M_PI_2)
+			});
+    		state.camera.position = v3_add(state.camera.position, v3_scale(right, 0.05f));
+    	}
+    	if (keys[SDL_SCANCODE_RIGHT]) {
+    		state.camera.view_dir.x += 0.01f;
+    	}
+    	if (keys[SDL_SCANCODE_LEFT]) {
+    		state.camera.view_dir.x -= 0.01f;
     	}
     	if (keys[SDL_SCANCODE_1] && keywait(10)) {
     		i = 0;
@@ -240,14 +259,26 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	if (keys[SDL_SCANCODE_2] && keywait(10)) {
     		i = 1;
     	}
+    	apply_transformation(&instances[0][0], (Transformations_t) {
+			.scale = 1.0f,
+			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
+			.translation = (v3_t) {0, 0, 0}});
+    	apply_transformation(&instances[0][1], (Transformations_t) {
+			.scale = 1.0f,
+			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
+			.translation = (v3_t) {0, 0, 0}});
 
     	// Rendering
     	memset(state.pixels, 0, sizeof(state.pixels)); // clear buffer
-        ClearScreen(0);
+    	for (int y = -SCREEN_HEIGHT/2; y < SCREEN_HEIGHT / 2; y++) {
+    		for (int x = -SCREEN_WIDTH/2; x < SCREEN_WIDTH/2; x++) {
+    			setPixel(x, y, BLACK);
+    		}
+    	}
     	if (i == 0) {
-			RenderScene(scene);
-		}
-		if (i == 1) {
+    		RenderScene(scene);
+    	}
+    	if (i == 1) {
 			RenderScene(scene2);
 		}
 
