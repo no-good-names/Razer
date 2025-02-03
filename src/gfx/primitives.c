@@ -3,13 +3,13 @@
 //
 
 #include "primitives.h"
+#include "typedef.h"
 
 #include <math.h>
-#include <stdio.h>
 
 void drawLine(void (setPixel)(int32_t x, int32_t y, uint32_t color), iv2_t start, iv2_t end, uint32_t color) {
 	if (start.x == end.x && start.y == end.y) {
-		setPixel((int32_t)round(start.x), (int32_t)start.y, color);
+		setPixel(start.x, start.y, color);
 		return;
 	}
 

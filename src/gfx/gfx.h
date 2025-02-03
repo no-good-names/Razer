@@ -10,5 +10,7 @@
 #include "objects.h"
 #include "primitives.h"
 #include "camera.h"
+#include "render.h"
+#include "scene.h"
 
 #endif //GFX_H

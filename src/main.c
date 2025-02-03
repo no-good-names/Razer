@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
-#include "gfx/camera.h"
 #include "gfx/gfx.h"
 
 #define RENDER_WIREFRAME 1

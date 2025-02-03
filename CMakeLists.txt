@@ -14,6 +14,7 @@ endif()
 
 set(LIBS ${LIBS} ${SDL2_LIBRARIES} m)
 
+# LONGGG
 add_executable(Razer
         src/main.c
         src/gfx/typedef.h
@@ -21,11 +22,27 @@ add_executable(Razer
         src/gfx/primitives.h
         src/gfx/math/maths.c
         src/gfx/math/maths.h
+        src/gfx/math/vec2.c
+        src/gfx/math/vec2.h
+        src/gfx/math/vec3.c
+        src/gfx/math/vec3.h
+        src/gfx/math/vec4.c
+        src/gfx/math/vec4.h
+        src/gfx/math/ivec2.c
+        src/gfx/math/ivec2.h
+        src/gfx/math/ivec3.c
+        src/gfx/math/ivec3.h
+        src/gfx/math/ivec4.c
+        src/gfx/math/ivec4.h
         src/gfx/objects.c
         src/gfx/objects.h
         src/gfx/gfx.h
         src/gfx/camera.c
         src/gfx/camera.h
+        src/gfx/scene.c
+        src/gfx/scene.h
+        src/gfx/render.c
+        src/gfx/render.h
 )
 
 target_link_libraries(Razer ${LIBS})

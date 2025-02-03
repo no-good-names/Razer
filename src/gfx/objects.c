@@ -65,6 +65,3 @@ void apply_transformation(Instance_t *instance, const Transformations_t translat
 	}
 	instance->object.center = v3_add(instance->object.center, translation.translation);
 }
-
-
-
