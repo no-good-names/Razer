@@ -24,11 +24,10 @@ iv2_t iv2_mul(const iv2_t a, const iv2_t b) {
 }
 
 iv2_t iv2_normalize(const iv2_t a) {
-	float length = sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
+	float length = sqrtf(a.x * a.x + a.y * a.y);
 	return (iv2_t) {
 		.x = a.x / length,
-		.y = a.y / length,
-		.z = a.z / length
+		.y = a.y / length
 	};
 }
 

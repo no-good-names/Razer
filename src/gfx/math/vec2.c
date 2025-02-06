@@ -24,11 +24,10 @@ v2_t v2_mul(const v2_t a, const v2_t b) {
 }
 
 v2_t v2_normalize(const v2_t a) {
-	float length = sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
+	float length = sqrtf(a.x * a.x + a.y * a.y);
 	return (v2_t) {
 		.x = a.x / length,
-		.y = a.y / length,
-		.z = a.z / length
+		.y = a.y / length
 	};
 }
 

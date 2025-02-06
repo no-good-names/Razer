@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 typedef struct {
-    int32_t x, y, z;
+    int32_t x, y;
 } iv2_t;
 
 iv2_t iv2_add(iv2_t a, iv2_t b);

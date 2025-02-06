@@ -6,8 +6,26 @@
 #include "typedef.h"
 
 #include <math.h>
+#include <stdio.h>
 
-void drawLine(void (setPixel)(int32_t x, int32_t y, uint32_t color), iv2_t start, iv2_t end, uint32_t color) {
+uint32_t *pixels = NULL;
+
+void initPixels(uint32_t *buffer) {
+    pixels = buffer;
+}
+
+inline void setPixel(int32_t x, int32_t y, const uint32_t color) {
+	// start at the middle of the screen
+	x += SCREEN_WIDTH/2;
+	y += SCREEN_HEIGHT/2;
+	// Check if x or y is out of bounds of the screen
+	if (x < 0 || x > SCREEN_WIDTH || y < 0 || y > SCREEN_HEIGHT) {
+		return;
+	}
+	pixels[(y * SCREEN_WIDTH) + x] = color;
+}
+
+inline void drawLine(iv2_t start, iv2_t end, uint32_t color) {
 	if (start.x == end.x && start.y == end.y) {
 		setPixel(start.x, start.y, color);
 		return;
@@ -41,14 +59,14 @@ void drawLine(void (setPixel)(int32_t x, int32_t y, uint32_t color), iv2_t start
 	}
 }
 
-void WireFrameTriangle(void setPixel(int32_t x, int32_t y, uint32_t color), const iv2_t a, const iv2_t b, const iv2_t c, uint32_t color) {
-	drawLine(setPixel, a, b, color);
-	drawLine(setPixel, b, c, color);
-	drawLine(setPixel, c, a, color);
+inline void WireFrameTriangle(const iv2_t a, const iv2_t b, const iv2_t c, uint32_t color) {
+	drawLine(a, b, color);
+	drawLine(b, c, color);
+	drawLine(c, a, color);
 }
 
 // https://github.com/ssloy/tinyrenderer/wiki/Lesson-2:-Triangle-rasterization-and-back-face-culling
-void FilledTriangle(void (setPixel)(int32_t x, int32_t y, uint32_t color), iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
+inline void FilledTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
 	// Sort vertices by y-coordinate (a.y <= b.y <= c.y)
 	if (a.y > b.y) swap(a, b);
 	if (a.y > c.y) swap(a, c);
@@ -57,7 +75,7 @@ void FilledTriangle(void (setPixel)(int32_t x, int32_t y, uint32_t color), iv2_t
 	// Check for degenerate triangle (collapsed into a line or point)
 	int total_height = c.y - a.y;
 	if (total_height == 0) {
-		drawLine(setPixel, a, b, color);
+		drawLine(a, b, color);
 	}
 
 	// Draw the top half of the triangle (a to b)

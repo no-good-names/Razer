@@ -11,7 +11,7 @@ struct {
 	SDL_Window *window; // canvas
 	SDL_Renderer *renderer;
 	SDL_Texture *texture;
-	uint32_t pixels[SCREEN_WIDTH * SCREEN_HEIGHT]; // viewport
+	uint32_t pixels[SCREEN_WIDTH * SCREEN_HEIGHT]; // buffer / canvas
 	bool running;
 	Camera_t camera;
 } state;
@@ -34,17 +34,7 @@ void ProjectToCanvas(iv2_t *dest, const v3_t v) {
 	};
 }
 
-void setPixel(int32_t x, int32_t y, const uint32_t color) {
-	// start at the middle of the screen
-	x += SCREEN_WIDTH/2;
-	y += SCREEN_HEIGHT/2;
-	// Check if x or y is out of bounds
-	// EX: x=-SCREEN_WIDTH/2 - 1; x+= SCREEN_WIDTH/2; x=-1; doesn't draw
-	if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT) {
-		return;
-	}
-	state.pixels[(y * SCREEN_WIDTH) + x] = color;
-}
+
 
 v3_t vertices[1][8] = {
 	{
@@ -56,16 +46,6 @@ v3_t vertices[1][8] = {
 		{-1, 1, -1},
 		{-1, -1, -1},
 		{1, -1, -1}
-	}
-};
-
-v3_t vertices2[1][5] = {
-	{
-		{-1, -1, 1},
-		{-1, -1, -1},
-		{1, -1, 1},
-		{1, -1, -1},
-		{ 0, 1, 0}
 	}
 };
 
@@ -86,16 +66,6 @@ iv3_t triangles[1][12] = {
 	}
 };
 
-iv3_t triangles2[1][6] = {
-	{
-		{0, 1, 4},
-		{0, 2, 4},
-		{2, 3, 4},
-		{4, 3, 4},
-		{1, 3, 4},
-		{1, 2, 3}
-	}
-};
 
 uint32_t colors[12] = {
 	RED,
@@ -112,6 +82,27 @@ uint32_t colors[12] = {
 	CYAN
 };
 
+v3_t vertices2[1][5] = {
+	{
+		{-1, -1, 1},
+		{-1, -1, -1},
+		{1, -1, 1},
+		{1, -1, -1},
+		{ 0, 1, 0}
+	}
+};
+
+iv3_t triangles2[1][6] = {
+	{
+		{0, 1, 4},
+		{0, 2, 4},
+		{2, 3, 4},
+		{2, 3, 4},
+		{1, 3, 4},
+		{1, 2, 3}
+	}
+};
+
 uint32_t colors2[6] = {
 	RED,
 	GREEN,
@@ -123,9 +114,9 @@ uint32_t colors2[6] = {
 
 void renderTriangle(iv2_t projected[3], uint32_t color) {
 #if RENDER_WIREFRAME == 1
-	WireFrameTriangle(setPixel, projected[0], projected[1], projected[2], color);
+	WireFrameTriangle(projected[0], projected[1], projected[2], color);
 #else
-	FilledTriangle(setPixel, projected[0], projected[1], projected[2], color);
+	FilledTriangle(projected[0], projected[1], projected[2], color);
 #endif
 }
 
@@ -169,6 +160,7 @@ bool keywait(int miliseconds) {
 }
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
+	initPixels(state.pixels);
 	SDL_Init(SDL_INIT_VIDEO);
     state.window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -186,13 +178,13 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	create_instance(&instances[0][0], square, (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
-		.translation = (v3_t) {0, 0, 6}
+		.translation = (v3_t) {2, 0, 8}
 	});
 
 	create_instance(&instances[0][1], prism, (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
-		.translation = (v3_t) {0, 0, 6}
+		.translation = (v3_t) {-2, 0, 8}
 	});
 
 	Scene_t scene = create_scene(&instances[0][0], 1);
@@ -264,7 +256,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 			.translation = (v3_t) {0, 0, 0}});
     	apply_transformation(&instances[0][1], (Transformations_t) {
 			.scale = 1.0f,
-			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
+			.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
 			.translation = (v3_t) {0, 0, 0}});
 
     	// Rendering
@@ -274,12 +266,8 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     			setPixel(x, y, BLACK);
     		}
     	}
-    	if (i == 0) {
-    		RenderScene(scene);
-    	}
-    	if (i == 1) {
-			RenderScene(scene2);
-		}
+    	RenderScene(scene);
+    	RenderScene(scene2);
 
 		// Update screen
         SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREEN_WIDTH * sizeof(state.pixels[0]));

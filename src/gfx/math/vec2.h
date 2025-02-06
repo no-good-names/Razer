@@ -2,7 +2,7 @@
 #define VEC2_H
 
 typedef struct {
-    float x, y, z;
+    float x, y;
 } v2_t;
 
 v2_t v2_add(v2_t a, v2_t b);
