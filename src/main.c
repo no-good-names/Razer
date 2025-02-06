@@ -5,7 +5,7 @@
 
 #include "gfx/gfx.h"
 
-#define RENDER_WIREFRAME 1
+#define RENDER_WIREFRAME 0
 
 struct {
 	SDL_Window *window; // canvas
@@ -173,22 +173,23 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	const Object_t square = create_object(vertices[0], triangles[0], 8, 12, colors);
 	const Object_t prism = create_object(vertices2[0], triangles2[0], 5, 6, colors2);
 
-	Instance_t instances[1][2] = {0};
+	Instance_t instances0[1] = {0};
+	Instance_t instances1[1] = {0};
 
-	create_instance(&instances[0][0], square, (Transformations_t) {
+	create_instance(&instances0[0], square, (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
 		.translation = (v3_t) {2, 0, 8}
 	});
 
-	create_instance(&instances[0][1], prism, (Transformations_t) {
+	create_instance(&instances1[0], prism, (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
 		.translation = (v3_t) {-2, 0, 8}
 	});
 
-	Scene_t scene = create_scene(&instances[0][0], 1);
-	Scene_t scene2 = create_scene(&instances[0][1], 1);
+	Scene_t scene = create_scene(&instances0[0], 1);
+	Scene_t scene2 = create_scene(&instances1[0], 1);
 	int i = 0;
     while (state.running) {
     	// SDL2 events
@@ -250,11 +251,11 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	if (keys[SDL_SCANCODE_2] && keywait(10)) {
     		i = 1;
     	}
-    	apply_transformation(&instances[0][0], (Transformations_t) {
+    	apply_transformation(&scene.instances[0], (Transformations_t) {
 			.scale = 1.0f,
 			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
 			.translation = (v3_t) {0, 0, 0}});
-    	apply_transformation(&instances[0][1], (Transformations_t) {
+    	apply_transformation(&scene2.instances[0], (Transformations_t) {
 			.scale = 1.0f,
 			.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
 			.translation = (v3_t) {0, 0, 0}});

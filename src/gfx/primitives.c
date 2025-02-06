@@ -19,7 +19,7 @@ inline void setPixel(int32_t x, int32_t y, const uint32_t color) {
 	x += SCREEN_WIDTH/2;
 	y += SCREEN_HEIGHT/2;
 	// Check if x or y is out of bounds of the screen
-	if (x < 0 || x > SCREEN_WIDTH || y < 0 || y > SCREEN_HEIGHT) {
+	if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT) {
 		return;
 	}
 	pixels[(y * SCREEN_WIDTH) + x] = color;
