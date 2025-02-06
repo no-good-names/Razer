@@ -5,7 +5,7 @@
 
 #include "gfx/gfx.h"
 
-#define RENDER_WIREFRAME 0
+#define RENDER_WIREFRAME 1
 
 struct {
 	SDL_Window *window; // canvas
