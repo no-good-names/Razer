@@ -7,7 +7,7 @@ iv4_t iv4_add(const iv4_t a, const iv4_t b) {
 		.x = a.x + b.x,
 		.y = a.y + b.y,
 		.z = a.z + b.z,
-        .z = a.w + b.w
+        .w = a.w + b.w
 	};
 }
 

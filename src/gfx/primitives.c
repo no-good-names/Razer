@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 uint32_t *pixels = NULL;
 
@@ -103,4 +104,3 @@ void FillTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
 		}
 	}
 }
-
