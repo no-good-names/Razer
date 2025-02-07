@@ -41,8 +41,6 @@ add_executable(Razer
         src/gfx/camera.h
         src/gfx/scene.c
         src/gfx/scene.h
-        src/gfx/render.c
-        src/gfx/render.h
 )
 
 target_link_libraries(Razer ${LIBS})

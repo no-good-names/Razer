@@ -8,6 +8,6 @@
 #include "objects.h"
 #include "camera.h"
 
-
+// TODO: Implement Scenes
 
 #endif //SCENE_H

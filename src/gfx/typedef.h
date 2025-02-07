@@ -47,4 +47,11 @@
 
 #define MAX_OBJECT_VERTICES 1000
 
+#if defined(_MSC_VER)
+#define INLINE __forceinline
+#else
+#define INLINE static inline __attribute((always_inline))
+#endif
+
+
 #endif //TYPEDEF_H

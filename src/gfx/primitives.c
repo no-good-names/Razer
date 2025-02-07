@@ -14,18 +14,7 @@ void initPixels(uint32_t *buffer) {
     pixels = buffer;
 }
 
-inline void setPixel(int32_t x, int32_t y, const uint32_t color) {
-	// start at the middle of the screen
-	x += SCREEN_WIDTH/2;
-	y += SCREEN_HEIGHT/2;
-	// Check if x or y is out of bounds of the screen
-	if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT) {
-		return;
-	}
-	pixels[(y * SCREEN_WIDTH) + x] = color;
-}
-
-inline void drawLine(iv2_t start, iv2_t end, uint32_t color) {
+void drawLine(iv2_t start, iv2_t end, uint32_t color) {
 	if (start.x == end.x && start.y == end.y) {
 		setPixel(start.x, start.y, color);
 		return;
@@ -59,14 +48,8 @@ inline void drawLine(iv2_t start, iv2_t end, uint32_t color) {
 	}
 }
 
-inline void WireFrameTriangle(const iv2_t a, const iv2_t b, const iv2_t c, uint32_t color) {
-	drawLine(a, b, color);
-	drawLine(b, c, color);
-	drawLine(c, a, color);
-}
-
 // https://github.com/ssloy/tinyrenderer/wiki/Lesson-2:-Triangle-rasterization-and-back-face-culling
-inline void FilledTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
+void FillTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
 	// Sort vertices by y-coordinate (a.y <= b.y <= c.y)
 	if (a.y > b.y) swap(a, b);
 	if (a.y > c.y) swap(a, c);

@@ -34,8 +34,6 @@ void ProjectToCanvas(iv2_t *dest, const v3_t v) {
 	};
 }
 
-
-
 v3_t vertices[1][8] = {
 	{
 		{1, 1, 1},
@@ -239,18 +237,11 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 			});
     		state.camera.position = v3_add(state.camera.position, v3_scale(right, 0.05f));
     	}
-    	if (keys[SDL_SCANCODE_RIGHT]) {
+    	if (keys[SDL_SCANCODE_RIGHT])
     		state.camera.view_dir.x += 0.01f;
-    	}
-    	if (keys[SDL_SCANCODE_LEFT]) {
+    	if (keys[SDL_SCANCODE_LEFT])
     		state.camera.view_dir.x -= 0.01f;
-    	}
-    	if (keys[SDL_SCANCODE_1] && keywait(10)) {
-    		i = 0;
-		}
-    	if (keys[SDL_SCANCODE_2] && keywait(10)) {
-    		i = 1;
-    	}
+
     	apply_transformation(&scene.instances[0], (Transformations_t) {
 			.scale = 1.0f,
 			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
