@@ -114,7 +114,7 @@ void renderTriangle(iv2_t projected[3], uint32_t color) {
 #if RENDER_WIREFRAME == 1
 	WireFrameTriangle(projected[0], projected[1], projected[2], color);
 #else
-	FilledTriangle(projected[0], projected[1], projected[2], color);
+	FillTriangle(projected[0], projected[1], projected[2], color);
 #endif
 }
 
@@ -125,8 +125,8 @@ v3_t rotate_scene(v3_t v, v2_t rotation) {
 	return v;
 }
 
-void renderObject(Object_t object) {
-	static iv2_t projectedVertices[MAX_OBJECT_VERTICES];
+void renderObject(const Object_t object) {
+	iv2_t projectedVertices[MAX_OBJECT_VERTICES];
 	for (int i = 0; i < object.numVertices; i++) {
 		ProjectToCanvas(&projectedVertices[i], rotate_scene(v3_add(object.vertices[i],
 			v3_sub(object.center, state.camera.position)), state.camera.view_dir));
@@ -167,27 +167,26 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
 	state.camera = create_camera((v3_t) {0, 0, 0}, (v2_t) {0, 0});
 
-	// Test Scene
+	// Test Objects and Instances
 	const Object_t square = create_object(vertices[0], triangles[0], 8, 12, colors);
-	const Object_t prism = create_object(vertices2[0], triangles2[0], 5, 6, colors2);
+	const Object_t pyramid = create_object(vertices2[0], triangles2[0], 5, 6, colors2);
 
-	Instance_t instances0[1] = {0};
-	Instance_t instances1[1] = {0};
+	Instance_t instances[2] = {0};
 
-	create_instance(&instances0[0], square, (Transformations_t) {
+	create_instance(&instances[0], square, (Transformations_t) {
 		.scale = 1.0f,
-		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
+		.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
 		.translation = (v3_t) {2, 0, 8}
 	});
 
-	create_instance(&instances1[0], prism, (Transformations_t) {
+	create_instance(&instances[1], pyramid, (Transformations_t) {
 		.scale = 1.0f,
-		.rotation = (v3_t) {0.00f, 0.00f, 0.01f},
+		.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
 		.translation = (v3_t) {-2, 0, 8}
 	});
 
-	Scene_t scene = create_scene(&instances0[0], 1);
-	Scene_t scene2 = create_scene(&instances1[0], 1);
+	// Create test scene
+	Scene_t scene = create_scene(instances, 2);
 	int i = 0;
     while (state.running) {
     	// SDL2 events
@@ -246,9 +245,9 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 			.scale = 1.0f,
 			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
 			.translation = (v3_t) {0, 0, 0}});
-    	apply_transformation(&scene2.instances[0], (Transformations_t) {
+    	apply_transformation(&scene.instances[1], (Transformations_t) {
 			.scale = 1.0f,
-			.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
+			.rotation = (v3_t) {0.01f, 0.00f, 0.00f},
 			.translation = (v3_t) {0, 0, 0}});
 
     	// Rendering
@@ -259,7 +258,6 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     		}
     	}
     	RenderScene(scene);
-    	RenderScene(scene2);
 
 		// Update screen
         SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREEN_WIDTH * sizeof(state.pixels[0]));

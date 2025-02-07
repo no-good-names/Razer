@@ -16,6 +16,7 @@ typedef struct {
 	int numTriangles;
 	v3_t center;
 	uint32_t *color;
+	char name[32];
 } Object_t;
 
 typedef struct {

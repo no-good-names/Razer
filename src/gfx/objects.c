@@ -55,9 +55,6 @@ void rotate_object(const Object_t object, v3_t rotation) {
 }
 
 void apply_transformation(Instance_t *instance, const Transformations_t translation) {
-	if (translation.rotation.x == 0 && translation.rotation.y == 0 && translation.rotation.z == 0) {
-		return;
-	}
 	for (int i = 0; i < instance->object.numVertices; i++) {
 		instance->object.vertices[i] = rotateX(scale_vertex(instance->object.vertices[i], translation.scale), translation.rotation.x);
 		instance->object.vertices[i] = rotateY(scale_vertex(instance->object.vertices[i], translation.scale), translation.rotation.y);
