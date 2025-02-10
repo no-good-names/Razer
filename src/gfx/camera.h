@@ -14,6 +14,9 @@ typedef struct {
 	float *z_buffer;
 } Camera_t;
 
+extern Camera_t g_camera;
+
 Camera_t create_camera(v3_t position, v2_t view_dir);
+void update_camera(const Camera_t *camera);
 
 #endif //CAMERA_H

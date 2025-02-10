@@ -1,6 +1,7 @@
 #ifndef VEC2_H
 #define VEC2_H
 #include <math.h>
+// #include <simde/x86/sse.h>
 #include "../typedef.h"
 
 typedef struct {
@@ -19,6 +20,13 @@ v2_t v2_normalize(v2_t a);
 v2_t v2_negate(v2_t v);
 v2_t v2_scale(v2_t v, float s);
 
+// SIMD example
+// INLINE void vec2_add(vec2 a, vec2 b, vec2 out) {
+//     const simde__m128 va = simde_mm_loadu_ps(a);
+//     const simde__m128 vb = simde_mm_loadu_ps(b);
+//     const simde__m128 v_out = simde_mm_add_ps(va, vb);
+//     simde_mm_storeu_ps(out, v_out);
+// }
 
 INLINE void vec2_add(vec2 a, vec2 b, vec2 out) {
     out[0] = a[0] + b[0];

@@ -3,36 +3,16 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+#define RENDER_WIREFRAME 0
 #include "gfx/gfx.h"
 
-#define RENDER_WIREFRAME 1
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 struct {
-	SDL_Window *window; // canvas
-	SDL_Renderer *renderer;
-	SDL_Texture *texture;
 	uint32_t pixels[SCREEN_WIDTH * SCREEN_HEIGHT]; // buffer / canvas
-	bool running;
 	Camera_t camera;
 } state;
-
-void ProjectToCanvas(iv2_t *dest, const v3_t v) {
-	if (v.z <= 0.0f) {
-		return;
-	}
-	const float d = 1.0f; // depth
-	// Perspective projection
-	v2_t dv = {
-		(v.x * d) / v.z,
-		(v.y * d) / v.z
-	};
-
-	// NOTE: THIS IS VIEWPORT TO CANVAS
-	*dest = (iv2_t) {
-		.x = dv.x * (SCREEN_WIDTH / VIEWPORT_WIDTH),
-		.y = dv.y * (SCREEN_HEIGHT / VIEWPORT_HEIGHT)
-	};
-}
 
 v3_t vertices[1][8] = {
 	{
@@ -110,43 +90,6 @@ uint32_t colors2[6] = {
 	CYAN
 };
 
-void renderTriangle(iv2_t projected[3], uint32_t color) {
-#if RENDER_WIREFRAME == 1
-	WireFrameTriangle(projected[0], projected[1], projected[2], color);
-#else
-	FillTriangle(projected[0], projected[1], projected[2], color);
-#endif
-}
-
-v3_t rotate_scene(v3_t v, v2_t rotation) {
-	v = rotateX(v, rotation.x);
-	v = rotateY(v, rotation.y);
-	v = rotateZ(v, 0);
-	return v;
-}
-
-void renderObject(const Object_t object) {
-	iv2_t projectedVertices[MAX_OBJECT_VERTICES];
-	for (int i = 0; i < object.numVertices; i++) {
-		ProjectToCanvas(&projectedVertices[i], rotate_scene(v3_add(object.vertices[i],
-			v3_sub(object.center, state.camera.position)), state.camera.view_dir));
-	}
-	for (int i = 0; i < object.numTriangles; i++) {
-		iv2_t renderedTriangle[3] = {
-			projectedVertices[object.triangles[i].x],
-			projectedVertices[object.triangles[i].y],
-			projectedVertices[object.triangles[i].z],
-		};
-		renderTriangle(renderedTriangle, object.color[i]);
-	}
-}
-
-void RenderScene(const Scene_t scene) {
-	for (int i = 0; i < scene.numInstances; i++) {
-		renderObject(scene.instances[i].object);
-	}
-}
-
 bool keywait(int miliseconds) {
 	static int lastTime = 0;
 	int currentTime = SDL_GetTicks();
@@ -158,12 +101,7 @@ bool keywait(int miliseconds) {
 }
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
-	initPixels(state.pixels);
-	SDL_Init(SDL_INIT_VIDEO);
-    state.window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    state.texture = SDL_CreateTexture(state.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-    state.running = true;
+	init_renderer(state.pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	state.camera = create_camera((v3_t) {0, 0, 0}, (v2_t) {0, 0});
 
@@ -187,16 +125,10 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
 	// Create test scene
 	Scene_t scene = create_scene(instances, 2);
-	int i = 0;
-    while (state.running) {
-    	// SDL2 events
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                state.running = false;
-                goto end;
-            }
-        }
+
+    while (running == true) {
+    	updateEvents();
+    	update_camera(&state.camera);
 
         // Inputs
     	const uint8_t *keys = SDL_GetKeyboardState(NULL);
@@ -260,21 +192,8 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	RenderScene(scene);
 
 		// Update screen
-        SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREEN_WIDTH * sizeof(state.pixels[0]));
-        SDL_RenderCopyEx(
-            state.renderer,
-            state.texture,
-            NULL,
-            NULL,
-            0.0,
-            NULL,
-            SDL_FLIP_VERTICAL);
-        SDL_RenderPresent(state.renderer);
+        updateWindow();
     }
-    end:
-    SDL_DestroyTexture(state.texture);
-    SDL_DestroyRenderer(state.renderer);
-    SDL_DestroyWindow(state.window);
-    SDL_Quit();
+    destroyWindow();
     return 0;
 }

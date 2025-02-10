@@ -20,7 +20,6 @@ iv2_t iv2_normalize(iv2_t a);
 iv2_t iv2_negate(iv2_t v);
 iv2_t iv2_scale(iv2_t v, int s);
 
-
 INLINE void ivec2_add(ivec2 a, ivec2 b, ivec2 out) {
     out[0] = a[0] + b[0];
     out[1] = a[1] + b[1];

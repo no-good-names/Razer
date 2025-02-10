@@ -9,12 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-uint32_t *pixels = NULL;
-
-void initPixels(uint32_t *buffer) {
-    pixels = buffer;
-}
-
 void drawLine(iv2_t start, iv2_t end, uint32_t color) {
 	if (start.x == end.x && start.y == end.y) {
 		setPixel(start.x, start.y, color);
@@ -31,7 +25,7 @@ void drawLine(iv2_t start, iv2_t end, uint32_t color) {
 
 	while (1) {
 		// if length is greater than the screen width or height then break
-		if (x0 < -SCREEN_WIDTH/2 || x0 >= SCREEN_WIDTH/2 || y0 < -SCREEN_HEIGHT/2 || y0 >= SCREEN_HEIGHT/2) {
+		if (x0 < -screen_size.x/2 || x0 >= screen_size.y/2 || y0 < -screen_size.x/2 || y0 >= screen_size.y/2) {
 			break;
 		}
 		setPixel(x0, y0, color);
@@ -60,6 +54,7 @@ void FillTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
 	int total_height = c.y - a.y;
 	if (total_height == 0) {
 		drawLine(a, b, color);
+		return;
 	}
 
 	// Draw the top half of the triangle (a to b)

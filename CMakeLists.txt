@@ -14,6 +14,8 @@ endif()
 
 set(LIBS ${LIBS} ${SDL2_LIBRARIES} m)
 
+include_directories(lib/smide)
+
 # LONGGG
 add_executable(Razer
         src/main.c
@@ -41,6 +43,8 @@ add_executable(Razer
         src/gfx/camera.h
         src/gfx/scene.c
         src/gfx/scene.h
+        src/gfx/window.h
+        src/gfx/window.c
 )
 
 target_link_libraries(Razer ${LIBS})

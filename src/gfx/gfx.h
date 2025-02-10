@@ -11,5 +11,6 @@
 #include "primitives.h"
 #include "camera.h"
 #include "scene.h"
+#include "window.h"
 
 #endif //GFX_H

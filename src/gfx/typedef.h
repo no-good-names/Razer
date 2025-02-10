@@ -5,25 +5,6 @@
 #ifndef TYPEDEF_H
 #define TYPEDEF_H
 
-#ifndef WINDOW_WIDTH
-#define WINDOW_WIDTH 1200
-#endif
-#ifndef WINDOW_HEIGHT
-#define WINDOW_HEIGHT 900
-#endif
-
-#ifndef SCREEN_WIDTH
-#define SCREEN_WIDTH 1200
-#endif
-
-#ifndef SCREEN_HEIGHT
-#define SCREEN_HEIGHT 900
-#endif
-
-// Auto aspect ratio
-#define VIEWPORT_WIDTH 1.0f
-#define VIEWPORT_HEIGHT (VIEWPORT_WIDTH * (float) SCREEN_HEIGHT / SCREEN_WIDTH)
-
 #define ASSERT(condition, message) if (!(condition)) { fprintf(stderr, "Assertion failed: %s\n", message); return 1; }
 #define DEPRECATED(message) __attribute__((deprecated(message)))
 #define WARNING(message) __attribute__((warning(message)))

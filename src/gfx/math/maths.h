@@ -18,4 +18,8 @@
 v3_t rotateX(v3_t v, float angle);
 v3_t rotateY(v3_t v, float angle);
 v3_t rotateZ(v3_t v, float angle);
+
+float rotateX_m(vec3 v, float angle);
+float rotateY_m(vec3 v, float angle);
+float rotateZ_m(vec3 v, float angle);
 #endif

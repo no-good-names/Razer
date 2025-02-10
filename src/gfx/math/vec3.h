@@ -36,7 +36,6 @@ INLINE void vec3_mul(vec3 a, vec3 b, vec3 out) {
 	out[0] = a[0] * b[0];
 	out[1] = a[1] * b[1];
 	out[2] = a[2] * b[2];
-	out[3] = a[3] * b[3];
 }
 INLINE float vec3_dot(vec3 a, vec3 b) {
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -54,13 +53,11 @@ INLINE void vec3_negate(vec3 v, vec3 out) {
 	out[0] = v[0] * -1;
 	out[1] = v[1] * -1;
 	out[2] = v[2] * -1;
-	out[3] = v[3] * -1;
 }
-INLINE void vec3_scale(vec3 v, int s, vec3 out) {
+INLINE void vec3_scale(vec3 v, float s, vec3 out) {
 	out[0] = v[0] * s;
 	out[1] = v[1] * s;
 	out[2] = v[2] * s;
-	out[3] = v[3] * s;
 }
 
 

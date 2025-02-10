@@ -7,6 +7,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "camera.h"
+
+void ProjectToCanvas(iv2_t *dest, const v3_t v) {
+	if (v.z <= 0.0f) {
+		return;
+	}
+	const float d = 1.0f; // depth
+	// Perspective projection
+	v2_t dv = {
+		(v.x * d) / v.z,
+		(v.y * d) / v.z
+	};
+
+	// NOTE: THIS IS VIEWPORT TO CANVAS
+	*dest = (iv2_t) {
+		.x = dv.x * (screen_size.x / aspect_ratio.x),
+		.y = dv.y * (screen_size.y / aspect_ratio.y)
+	};
+}
+
 Object_t create_object(v3_t *vertices, iv3_t *triangles, int numVertices, int numTriangles, uint32_t *color) {
 	Object_t object = {
 		.vertices = vertices,
@@ -54,6 +74,15 @@ void rotate_object(const Object_t object, v3_t rotation) {
 	}
 }
 
+
+void renderTriangle(iv2_t projected[3], uint32_t color) {
+#if RENDER_WIREFRAME == 1
+	WireFrameTriangle(projected[0], projected[1], projected[2], color);
+#else
+	FillTriangle(projected[0], projected[1], projected[2], color);
+#endif
+}
+
 void apply_transformation(Instance_t *instance, const Transformations_t translation) {
 	for (int i = 0; i < instance->object.numVertices; i++) {
 		instance->object.vertices[i] = rotateX(scale_vertex(instance->object.vertices[i], translation.scale), translation.rotation.x);
@@ -61,4 +90,26 @@ void apply_transformation(Instance_t *instance, const Transformations_t translat
 		instance->object.vertices[i] = rotateZ(scale_vertex(instance->object.vertices[i], translation.scale), translation.rotation.z);
 	}
 	instance->object.center = v3_add(instance->object.center, translation.translation);
+}
+
+void renderObject(const Object_t object) {
+	iv2_t projectedVertices[MAX_OBJECT_VERTICES];
+	for (int i = 0; i < object.numVertices; i++) {
+		ProjectToCanvas(&projectedVertices[i], rotate_scene(v3_add(object.vertices[i],
+			v3_sub(object.center, g_camera.position)), g_camera.view_dir));
+	}
+	for (int i = 0; i < object.numTriangles; i++) {
+		iv2_t renderedTriangle[3] = {
+			projectedVertices[object.triangles[i].x],
+			projectedVertices[object.triangles[i].y],
+			projectedVertices[object.triangles[i].z],
+		};
+		renderTriangle(renderedTriangle, object.color[i]);
+	}
+}
+
+void RenderScene(const Scene_t scene) {
+	for (int i = 0; i < scene.numInstances; i++) {
+		renderObject(scene.instances[i].object);
+	}
 }

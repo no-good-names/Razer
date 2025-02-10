@@ -1,0 +1,3 @@
+[submodule "lib/smide"]
+	path = lib/smide
+	url = https://github.com/simd-everywhere/simde.git
