@@ -184,11 +184,6 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
     	// Rendering
     	memset(state.pixels, 0, sizeof(state.pixels)); // clear buffer
-    	for (int y = -SCREEN_HEIGHT/2; y < SCREEN_HEIGHT / 2; y++) {
-    		for (int x = -SCREEN_WIDTH/2; x < SCREEN_WIDTH/2; x++) {
-    			setPixel(x, y, BLACK);
-    		}
-    	}
     	RenderScene(scene);
 
 		// Update screen
