@@ -15,8 +15,8 @@ SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
 bool running = false;
 
-void init_renderer(uint32_t *buffer, const int width, const int height) {
-	pixels = buffer;
+void init_renderer(const int width, const int height) {
+	pixels = (uint32_t *) malloc(800 * 600 * sizeof(uint32_t));;
 	screen_size.x = width;
 	screen_size.y = height;
 	aspect_ratio.x = (float) width / height;

@@ -25,7 +25,7 @@ extern SDL_Renderer *renderer;
 extern SDL_Texture *texture;
 extern bool running;
 
-void init_renderer(uint32_t *buffer, int width, int height);
+void init_renderer(int width, int height);
 void updateEvents();
 void updateWindow();
 void destroyWindow();

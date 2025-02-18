@@ -11,7 +11,6 @@
 
 void ProjectToCanvas(ivec2 *dest, const vec3 v) {
     if (v[2] <= 0.0f) {
-        printf("Vertex is behind the camera\n");
         return;
     }
     const float d = 1.0f; // depth

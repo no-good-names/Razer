@@ -25,7 +25,7 @@ void drawLine(const ivec2 start, const ivec2 end, const uint32_t color) {
 
 	while (1) {
 		// if length is greater than the screen width or height then break
-		if (x0 < 0 || x0 >= screen_size.x || y0 < 0 || y0 >= screen_size.y) {
+		if (x0 < -screen_size.x/2 || x0 >= screen_size.x || y0 < -screen_size.y/2 || y0 >= screen_size.y/2) {
 			break;
 		}
 		setPixel(x0, y0, color);

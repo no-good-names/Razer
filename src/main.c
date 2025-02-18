@@ -6,11 +6,6 @@
 
 #include "gfx/gfx.h"
 
-struct {
-	uint32_t *pixels;
-	Camera_t camera;
-} state;
-
 vec3 vertices[1][8] = {
 	{
 		{1, 1, 1},
@@ -67,8 +62,7 @@ bool keywait(int miliseconds) {
 }
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
-	state.pixels = (uint32_t *) malloc(800 * 600 * sizeof(uint32_t));
-	init_renderer(state.pixels, 800, 600);
+	init_renderer(800, 600);
 
 	const Object_t cube = create_object(vertices[0], triangles[0], 8, 12, colors);
 
@@ -77,7 +71,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	create_instance(&instances[0], cube,  (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = {0, 0, 0},
-		.translation = {0, 0, 5}
+		.translation = {0, 0, 1}
 	});
 	Scene_t scene = create_scene(instances, 1);
 
@@ -85,7 +79,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	updateEvents();
 
     	// Rendering
-    	memset(state.pixels, 0, sizeof(state.pixels)); // clear buffer
+    	memset(pixels, 0, sizeof(pixels)); // clear buffer
     	renderObject(scene.instances[0].object);
 
 		// Update screen
