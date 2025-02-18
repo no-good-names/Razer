@@ -9,16 +9,14 @@
 #include "math/maths.h"
 
 typedef struct {
-	v3_t position;
-	vec3 position_m;
-	v2_t view_dir;
-	vec3 view_dir_m;
+	vec3 position;
+	vec3 view_dir;
 	float *z_buffer;
 } Camera_t;
 
 extern Camera_t g_camera;
 
-Camera_t create_camera(v3_t position, v2_t view_dir);
+Camera_t create_camera(const vec3 position, const vec3 view_dir);
 void update_camera(const Camera_t *camera);
 
 #endif //CAMERA_H

@@ -60,5 +60,10 @@ INLINE void vec3_scale(vec3 v, float s, vec3 out) {
 	out[2] = v[2] * s;
 }
 
+INLINE void vec3_cpy(vec3 a, vec3 out) {
+	out[0] = a[0];
+	out[1] = a[1];
+	out[2] = a[2];
+}
 
 #endif

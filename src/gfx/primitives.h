@@ -21,22 +21,14 @@ INLINE void setPixel(int32_t x, int32_t y, const uint32_t color) {
 	pixels[(y * screen_size.x) + x] = color;
 }
 
-void drawLine(iv2_t start, iv2_t end, uint32_t color);
-void drawLine_m(ivec2 start, ivec2 end, uint32_t color);
+void drawLine(const ivec2 start, const ivec2 end, uint32_t color);
 
-INLINE void WireFrameTriangle(const iv2_t a, const iv2_t b, const iv2_t c, uint32_t color) {
+INLINE void WireFrameTriangle(const ivec2 a, const ivec2 b, const ivec2 c, const uint32_t color) {
 	drawLine(a, b, color);
 	drawLine(b, c, color);
 	drawLine(c, a, color);
 }
 
-
-INLINE void WireFrameTriangle_m(const ivec2 a, const ivec2 b, const ivec2 c, uint32_t color) {
-	drawLine_m(a, b, color);
-	drawLine_m(b, c, color);
-	drawLine_m(c, a, color);
-}
-
-WARNING("Incomplete") void FillTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color);
+WARNING("Incomplete") void FillTriangle(ivec2 a, ivec2 b, ivec2 c, uint32_t color);
 
 #endif //PRIMITIVES_H

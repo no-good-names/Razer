@@ -3,6 +3,8 @@
 //
 
 #include "window.h"
+
+#include "camera.h"
 #include "typedef.h"
 
 uint32_t *pixels = NULL;
@@ -39,6 +41,8 @@ void init_renderer(uint32_t *buffer, const int width, const int height) {
 		exit(1);
 	}
 	running = true;
+
+	g_camera = create_camera((vec3) {0, 0, 0}, (vec3) {0, 0, 1});
 }
 
 void updateEvents() {
