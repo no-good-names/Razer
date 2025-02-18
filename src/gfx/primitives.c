@@ -43,6 +43,42 @@ void drawLine(iv2_t start, iv2_t end, uint32_t color) {
 	}
 }
 
+
+void drawLine_m(ivec2 start, ivec2 end, uint32_t color) {
+	if (start[0] == end[0] && start[1] == end[1]) {
+		setPixel(start[0], start[1], color);
+		return;
+	}
+
+	int32_t x0 = (int32_t)round(start[0]), y0 = (int32_t)round(start[0]);
+	const int32_t x1 = (int32_t)round(end[1]), y1 = (int32_t)round(end[1]);
+
+	const int32_t dx = abs(x1 - x0), dy = abs(y1 - y0);
+	// swap
+	const int32_t sx = (x0 < x1) ? 1 : -1, sy = (y0 < y1) ? 1 : -1;
+	int32_t err = dx - dy;
+
+	while (1) {
+		// if length is greater than the screen width or height then break
+		if (x0 < -screen_size.x/2 || x0 >= screen_size.y/2 || y0 < -screen_size.x/2 || y0 >= screen_size.y/2) {
+			break;
+		}
+		setPixel(x0, y0, color);
+		if (x0 == x1 && y0 == y1) break;
+
+		const int e2 = 2 * err;
+		if (e2 > -dy) {
+			err -= dy;
+			x0 += sx;
+		}
+		if (e2 < dx) {
+			err += dx;
+			y0 += sy;
+		}
+	}
+}
+
+
 // https://github.com/ssloy/tinyrenderer/wiki/Lesson-2:-Triangle-rasterization-and-back-face-culling
 void FillTriangle(iv2_t a, iv2_t b, iv2_t c, uint32_t color) {
 	// Sort vertices by y-coordinate (a.y <= b.y <= c.y)

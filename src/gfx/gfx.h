@@ -5,6 +5,9 @@
 #ifndef GFX_H
 #define GFX_H
 
+#include <stdbool.h>
+#include <SDL2/SDL.h>
+
 #include "math/maths.h"
 #include "typedef.h"
 #include "objects.h"

@@ -4,10 +4,10 @@
 #include <SDL2/SDL.h>
 
 #define RENDER_WIREFRAME 0
-#include "gfx/gfx.h"
-
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+
+#include "gfx/gfx.h"
 
 struct {
 	uint32_t pixels[SCREEN_WIDTH * SCREEN_HEIGHT]; // buffer / canvas
@@ -15,6 +15,19 @@ struct {
 } state;
 
 v3_t vertices[1][8] = {
+	{
+		{1, 1, 1},
+		{-1, 1, 1},
+		{-1, -1, 1},
+		{1, -1, 1},
+		{1, 1, -1},
+		{-1, 1, -1},
+		{-1, -1, -1},
+		{1, -1, -1}
+	}
+};
+
+vec3 vertices_m[1][8] = {
 	{
 		{1, 1, 1},
 		{-1, 1, 1},
@@ -44,6 +57,22 @@ iv3_t triangles[1][12] = {
 	}
 };
 
+ivec3 triangles_m[1][12] = {
+	{
+		{0, 1, 2},
+		{0, 2, 3},
+		{4, 0, 3},
+		{4, 3, 7},
+		{5, 4, 7},
+		{5, 7, 6},
+		{1, 5, 6},
+		{1, 6, 2},
+		{4, 5, 1},
+		{4, 1, 0},
+		{2, 6, 7},
+		{2, 7, 3}
+	}
+};
 
 uint32_t colors[12] = {
 	RED,
@@ -105,22 +134,15 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
 	state.camera = create_camera((v3_t) {0, 0, 0}, (v2_t) {0, 0});
 
-	// Test Objects and Instances
-	const Object_t square = create_object(vertices[0], triangles[0], 8, 12, colors);
-	const Object_t pyramid = create_object(vertices2[0], triangles2[0], 5, 6, colors2);
+	const Object_t cube = create_object_m(vertices_m[0], triangles_m[0], 8, 12, colors);
 
 	Instance_t instances[2] = {0};
+	Instance_t instances2[1] = {0};
 
-	create_instance(&instances[0], square, (Transformations_t) {
+	create_instance_m(&instances2[0], cube, (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
-		.translation = (v3_t) {2, 0, 8}
-	});
-
-	create_instance(&instances[1], pyramid, (Transformations_t) {
-		.scale = 1.0f,
-		.rotation = (v3_t) {0.00f, 0.00f, 0.00f},
-		.translation = (v3_t) {-2, 0, 8}
+		.translation = (v3_t) {0, 0, 2}
 	});
 
 	// Create test scene
@@ -173,18 +195,11 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	if (keys[SDL_SCANCODE_LEFT])
     		state.camera.view_dir.x -= 0.01f;
 
-    	apply_transformation(&scene.instances[0], (Transformations_t) {
-			.scale = 1.0f,
-			.rotation = (v3_t) {0.00f, 0.01f, 0.00f},
-			.translation = (v3_t) {0, 0, 0}});
-    	apply_transformation(&scene.instances[1], (Transformations_t) {
-			.scale = 1.0f,
-			.rotation = (v3_t) {0.01f, 0.00f, 0.00f},
-			.translation = (v3_t) {0, 0, 0}});
 
     	// Rendering
     	memset(state.pixels, 0, sizeof(state.pixels)); // clear buffer
-    	RenderScene(scene);
+    	// RenderScene(scene);
+		renderObject_m(cube);
 
 		// Update screen
         updateWindow();

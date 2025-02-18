@@ -59,4 +59,9 @@ INLINE void ivec2_scale(ivec2 v, float s, ivec2 out) {
     out[1] = v[1] * s;
 }
 
+INLINE void ivec2_cpy(ivec2 a, ivec2 out) {
+    out[0] = a[0];
+    out[1] = a[1];
+}
+
 #endif

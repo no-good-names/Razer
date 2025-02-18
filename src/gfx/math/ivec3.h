@@ -8,7 +8,7 @@ typedef struct iVector3_t {
     int32_t x, y, z;
 } iv3_t;
 
-typedef int32_t ivec3[3];
+typedef int ivec3[3];
 
 iv3_t iv3_add(iv3_t a, iv3_t b);
 iv3_t iv3_sub(iv3_t a, iv3_t b);

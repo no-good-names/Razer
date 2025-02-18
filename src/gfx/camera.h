@@ -10,7 +10,9 @@
 
 typedef struct {
 	v3_t position;
+	vec3 position_m;
 	v2_t view_dir;
+	vec3 view_dir_m;
 	float *z_buffer;
 } Camera_t;
 
