@@ -87,7 +87,6 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	// Rendering
     	memset(state.pixels, 0, sizeof(state.pixels)); // clear buffer
     	renderObject(scene.instances[0].object);
-    	printf("%f, %f, %f\n", scene.instances[0].object.center[0], scene.instances[0].object.center[1], scene.instances[0].object.center[2]);
 
 		// Update screen
         updateWindow();

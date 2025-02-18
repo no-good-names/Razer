@@ -77,13 +77,9 @@ void renderObject(Object_t object) {
     ivec2 projectedVertices[MAX_OBJECT_VERTICES];
     for (int i = 0; i < object.numVertices; i++) {
         vec3 tmp = {0};
-    	printf("vertex: %d\n", i);
         vec3_sub(object.center, g_camera.position, tmp);
-    	printf("step 1 tmp: %f %f %f\n", tmp[0], tmp[1], tmp[2]);
         vec3_add(object.vertices[i], tmp, tmp);
-    	printf("step 2 tmp: %f %f %f\n", tmp[0], tmp[1], tmp[2]);
         rotate_m(tmp, g_camera.view_dir, tmp);
-    	printf("step 3 tmp: %f %f %f\n", tmp[0], tmp[1], tmp[2]);
         ProjectToCanvas(&projectedVertices[i], tmp);
     }
     for (int i = 0; i < object.numTriangles; i++) {
