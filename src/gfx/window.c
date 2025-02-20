@@ -6,6 +6,7 @@
 
 #include "camera.h"
 #include "typedef.h"
+#include <math.h>
 
 uint32_t *pixels = NULL;
 struct aspect_ratio aspect_ratio = {0, 0};
@@ -16,7 +17,7 @@ SDL_Texture *texture = NULL;
 bool running = false;
 
 void init_renderer(const int width, const int height) {
-	pixels = (uint32_t *) malloc(800 * 600 * sizeof(uint32_t));;
+	pixels = (uint32_t *) malloc(height * width * sizeof(uint32_t));;
 	screen_size.x = width;
 	screen_size.y = height;
 	aspect_ratio.x = (float) width / height;

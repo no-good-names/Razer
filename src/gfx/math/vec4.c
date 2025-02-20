@@ -7,7 +7,7 @@ v4_t v4_add(const v4_t a, const v4_t b) {
 		.x = a.x + b.x,
 		.y = a.y + b.y,
 		.z = a.z + b.z,
-        .z = a.w + b.w
+        .w = a.w + b.w
 	};
 }
 

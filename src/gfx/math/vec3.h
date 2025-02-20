@@ -2,6 +2,7 @@
 #define VEC3_H
 
 #include <math.h>
+#include "../typedef.h"
 
 typedef struct Vector3_t {
 	float x, y, z;

@@ -8,6 +8,8 @@
 #include <string.h>
 
 #include "camera.h"
+#include "math/maths.h"
+#include "math/vec3.h"
 
 void ProjectToCanvas(ivec2 *dest, const vec3 v) {
     if (v[2] <= 0.0f) {
@@ -15,7 +17,7 @@ void ProjectToCanvas(ivec2 *dest, const vec3 v) {
     }
     const float d = 1.0f; // depth
     // Perspective projection
-    ivec2 dv;
+    vec2 dv;
     dv[0] = (v[0] * d) / v[2];
     dv[1] = (v[1] * d) / v[2];
 
@@ -52,24 +54,17 @@ Scene_t create_scene(Instance_t *instances, const int numInstances) {
 	return scene;
 }
 
-void renderTriangle(ivec2 projected[3], uint32_t color) {
-	WireFrameTriangle(projected[0], projected[1], projected[2], color);
-}
-
-
 void apply_transformation(Instance_t *instance, Transformations_t translation) {
     for (int i = 0; i < instance->object.numVertices; i++) {
-        vec3 scaled_vertex;
-        vec3_scale(instance->object.vertices[i], translation.scale, scaled_vertex);
-
-        vec3 rotated_vertex;
-        rotateX(scaled_vertex, translation.rotation[0], rotated_vertex);
-        rotateY(rotated_vertex, translation.rotation[1], rotated_vertex);
-        rotateZ(rotated_vertex, translation.rotation[2], rotated_vertex);
-
-        vec3_cpy(instance->object.vertices[i], rotated_vertex);
+        // scale -> rotate -> translate
+        vec3_scale(instance->object.vertices[i], translation.scale, instance->object.vertices[i]);
+        rotate_m(instance->object.vertices[i], translation.rotation, instance->object.vertices[i]);
     }
     vec3_add(instance->object.center, translation.translation, instance->object.center);
+}
+
+void renderTriangle(ivec2 projected[3], uint32_t color) {
+	WireFrameTriangle(projected[0], projected[1], projected[2], color);
 }
 
 void renderObject(Object_t object) {
@@ -78,14 +73,15 @@ void renderObject(Object_t object) {
         vec3 tmp = {0};
         vec3_sub(object.center, g_camera.position, tmp);
         vec3_add(object.vertices[i], tmp, tmp);
+
         rotate_m(tmp, g_camera.view_dir, tmp);
         ProjectToCanvas(&projectedVertices[i], tmp);
     }
     for (int i = 0; i < object.numTriangles; i++) {
         ivec2 renderedTriangle[3];
-    	ivec2_cpy(renderedTriangle[0], projectedVertices[object.triangles[i][0]]);
-    	ivec2_cpy(renderedTriangle[1], projectedVertices[object.triangles[i][1]]);
-    	ivec2_cpy(renderedTriangle[2], projectedVertices[object.triangles[i][2]]);
+    	ivec2_cpy(projectedVertices[object.triangles[i][0]], renderedTriangle[0]);
+    	ivec2_cpy(projectedVertices[object.triangles[i][1]], renderedTriangle[1]);
+    	ivec2_cpy(projectedVertices[object.triangles[i][2]], renderedTriangle[2]);
         renderTriangle(renderedTriangle, object.color[i]);
     }
 }
