@@ -14,8 +14,6 @@ endif()
 
 set(LIBS ${LIBS} ${SDL2_LIBRARIES} m)
 
-include_directories(lib/smide)
-
 # LONGGG
 add_executable(Razer
         src/main.c
