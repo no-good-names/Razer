@@ -47,6 +47,9 @@ INLINE float ivec3_length(ivec3 a) {
 }
 INLINE void ivec3_normalize(ivec3 a, ivec3 out) {
     float length = ivec3_length(a);
+    if (length == 0) {
+        return;
+    }
     out[0] = a[0] / length;
     out[1] = a[1] / length;
     out[2] = a[2] / length;
@@ -61,7 +64,6 @@ INLINE void ivec3_scale(ivec3 v, int s, ivec3 out) {
     out[0] = v[0] * s;
     out[1] = v[1] * s;
     out[2] = v[2] * s;
-    out[3] = v[3] * s;
 }
 
 #endif

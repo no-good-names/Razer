@@ -15,6 +15,7 @@ SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
 bool running = false;
+struct dt dt = {0, 0, 0};
 
 void init_renderer(const int width, const int height) {
 	pixels = (uint32_t *) malloc(height * width * sizeof(uint32_t));;
@@ -44,9 +45,14 @@ void init_renderer(const int width, const int height) {
 	running = true;
 
 	g_camera = create_camera((vec3) {0, 0, 0}, (vec3) {0, 0, 1});
+	float lastTime = (float) SDL_GetTicks();
 }
 
 void updateEvents() {
+	// Calculate delta time every frame
+	dt.current = (float) SDL_GetTicks();
+	dt.deltaTime = dt.current - dt.last;
+	dt.last = dt.current;
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT) {

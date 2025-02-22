@@ -14,6 +14,8 @@ Camera_t create_camera(const vec3 position, const vec3 view_dir) {
 	return camera;
 }
 
-void update_camera(const Camera_t *camera) {
-	g_camera = *camera;
+void move_camera(vec3 dir, vec3 pos) {
+    vec3 new_position;
+    vec3_add(g_camera.position, dir, new_position);
+    vec3_add(new_position, pos, g_camera.position);
 }

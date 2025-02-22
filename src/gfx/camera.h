@@ -17,6 +17,6 @@ typedef struct {
 extern Camera_t g_camera;
 
 Camera_t create_camera(const vec3 position, const vec3 view_dir);
-void update_camera(const Camera_t *camera);
+void move_camera(vec3 dir, vec3 pos);
 
 #endif //CAMERA_H

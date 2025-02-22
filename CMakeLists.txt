@@ -45,6 +45,8 @@ add_executable(Razer
         src/gfx/scene.h
         src/gfx/window.h
         src/gfx/window.c
+        src/gfx/math/mat3.c
+        src/gfx/math/mat3.h
 )
 
 target_link_libraries(Razer ${LIBS})

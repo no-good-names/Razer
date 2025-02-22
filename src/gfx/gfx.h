@@ -16,6 +16,4 @@
 #include "scene.h"
 #include "window.h"
 
-#define PIXELS_SIZE screen_size.x * screen_size.y * sizeof(uint32_t)
-
 #endif //GFX_H

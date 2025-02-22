@@ -15,10 +15,10 @@
 #define DEG2RAD(deg) ((deg) * (PI / 180.0f))
 #define RAD2DEG(rad) ((rad) * (180.0f / PI))
 
-void rotateX(vec3 v, float angle, vec3 out);
-void rotateY(vec3 v, float angle, vec3 out);
-void rotateZ(vec3 v, float angle, vec3 out);
+void rotateX(const vec3 v, float angle, vec3 out);
+void rotateY(const vec3 v, float angle, vec3 out);
+void rotateZ(const vec3 v, float angle, vec3 out);
 
-void rotate_m(vec3 v, vec3 rotation, vec3 out);
+void rotate(const vec3 v, const vec3 rotation, vec3 out);
 
 #endif
