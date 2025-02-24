@@ -1,6 +1,8 @@
 #ifndef VEC4_H
 #define VEC4_H
 
+#include <math.h>
+
 #include "../typedef.h"
 
 typedef struct Vector4_t {

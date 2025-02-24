@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
-#define RENDER_WIREFRAME 1
 #define SHOW_FPS 1
 #include "gfx/gfx.h"
 
@@ -40,7 +39,6 @@ ivec3 triangles[1][12] = {
 	}
 };
 
-
 uint32_t colors[12] = {
 	RED,
 	RED,
@@ -55,6 +53,25 @@ uint32_t colors[12] = {
 	CYAN,
 	CYAN
 };
+
+// 2d square
+vec3 vertices_arr[4] = {
+	{1, 1, 0},
+	{-1, 1, 0},
+	{-1, -1, 0},
+	{1, -1, 0}
+};
+
+ivec3 triangles_arr[2] = {
+	{0, 1, 2},
+	{0, 2, 3}
+};
+
+uint32_t faceColors[2] = {
+	RED,
+	BLUE
+};
+
 
 bool keywait(int miliseconds) {
 	static int lastTime = 0;
@@ -71,24 +88,34 @@ float distance(vec3 a, vec3 b) {
 	return sqrtf(powf(b[0] - a[0], 2) + powf(b[1] - a[1], 2) + powf(b[2] - a[2], 2));
 }
 
+void debugPrint(const char* msg, vec3 v) {
+	printf("%s: (%f, %f, %f) | Length: %f\n", msg, v[0], v[1], v[2], vec3_length(v));
+}
+
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
 	init_renderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	// Test Objects and Instances
-	const Object_t square = create_object(vertices[0], triangles[0], 8, 12, colors);
-
-	Instance_t instances[1] = {0};
+	const Object_t cube = create_object(vertices[0], triangles[0], 8, 12, colors);
+	const Object_t square = create_object(vertices_arr, triangles_arr, 4, 2, faceColors);
+	Instance_t instances[2] = {0};
 
 	create_instance(&instances[0], square, (Transformations_t) {
 		.scale = 1.0f,
 		.rotation = {0.00f, 0.00f, 0.00f},
-		.translation = {0, 0, 5}
+		.translation = {-1.5f, 0, 5}
+	});
+	create_instance(&instances[1], cube, (Transformations_t) {
+		.scale = 1.0f,
+		.rotation = {0.00f, 0.00f, 0.00f},
+		.translation = {1.5f, 0, 5}
 	});
 
-
 	// Create test scene
-	Scene_t scene = create_scene(instances, 1);
+	Scene_t scene = create_scene(instances, 2);
 
+	// New: Set Draw Mode LINE or FILLED mode
+	SetDrawMode(LINE);
     while (running == true) {
     	updateEvents();
 
@@ -141,15 +168,20 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     		vec3_add(g_camera.position, right, g_camera.position);
     	}
     	// TODO: FIX ROTATION
-    	// if (keys[SDL_SCANCODE_RIGHT])
-    	// 	g_camera.view_dir[2] += DEG2RAD(1.0f);
-    	// if (keys[SDL_SCANCODE_LEFT])
-    	// 	g_camera.view_dir[2] -= DEG2RAD(1.0f);
+    	if (keys[SDL_SCANCODE_RIGHT])
+    		g_camera.view_dir[1] += DEG2RAD(1.0f);
+    	if (keys[SDL_SCANCODE_LEFT])
+    		g_camera.view_dir[1] -= DEG2RAD(1.0f);
 
     	apply_transformation(&scene.instances[0], (Transformations_t) {
 			.scale = 1.0f,
-			.rotation = {0.0f, 0.1f * dt.deltaTime, 0.0f},
+			.rotation = {0.0f, 1.0f, 0.0f},
 			.translation = {0, 0, 0}});
+    	apply_transformation(&scene.instances[1], (Transformations_t) {
+			.scale = 1.0f,
+			.rotation = {0.0f, 1.0f, 0.0f},
+			.translation = {0, 0, 0}});
+    	printf("%f\n", distance(scene.instances[1].object.vertices[0], scene.instances[1].object.vertices[1]));
 
     	// Rendering
     	memset(pixels, 0, PIXELS_SIZE); // clear buffer

@@ -5,13 +5,11 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "objects.h"
 #include "math/maths.h"
 
 typedef struct {
 	vec3 position;
 	vec3 view_dir;
-	float *z_buffer;
 } Camera_t;
 
 extern Camera_t g_camera;

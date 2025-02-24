@@ -9,6 +9,13 @@
 #include "typedef.h"
 #include "primitives.h"
 
+static enum {
+	LINE = 0,
+	FILLED = 1
+} DrawMode;
+
+extern uint32_t draw_mode;
+
 typedef struct {
 	vec3 *vertices;
 	ivec3 *triangles;
@@ -34,6 +41,10 @@ typedef struct {
 	Instance_t *instances;
 	int numInstances;
 } Scene_t;
+
+INLINE void SetDrawMode(uint32_t mode) {
+	draw_mode = mode;
+}
 
 // vecs
 void ProjectToCanvas(ivec2 *dest, const vec3 v);

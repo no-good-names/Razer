@@ -5,7 +5,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "objects.h"
 #include "camera.h"
 
 // TODO: Implement Scenes

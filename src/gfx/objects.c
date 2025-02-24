@@ -11,6 +11,8 @@
 #include "math/maths.h"
 #include "math/vec3.h"
 
+uint32_t draw_mode = LINE;
+
 void ProjectToCanvas(ivec2 *dest, const vec3 v) {
     if (v[2] <= 0.0f) {
         return;
@@ -55,20 +57,27 @@ Scene_t create_scene(Instance_t *instances, const int numInstances) {
 }
 
 void apply_transformation(Instance_t *instance, Transformations_t translation) {
-    for (int i = 0; i < instance->object.numVertices; i++) {
-        // scale -> rotate -> translate
-        vec3_scale(instance->object.vertices[i], translation.scale, instance->object.vertices[i]);
-        rotate(instance->object.vertices[i], translation.rotation, instance->object.vertices[i]);
-    }
-    vec3_add(instance->object.center, translation.translation, instance->object.center);
+	for (int i = 0; i < instance->object.numVertices; i++) {
+		vec3 tmp;
+		vec3_cpy(instance->object.vertices[i], tmp);
+		vec3_scale(tmp, translation.scale, tmp);
+		rotate(tmp, translation.rotation, tmp);
+		vec3_cpy(tmp, instance->object.vertices[i]);
+	}
+	vec3_add(instance->object.center, translation.translation, instance->object.center);
 }
 
+
 void renderTriangle(ivec2 projected[3], uint32_t color) {
-#if RENDER_WIREFRAME == 1
-	WireFrameTriangle(projected[0], projected[1], projected[2], color);
-#else
-	FillTriangle(projected[0], projected[1], projected[2], color);
-#endif
+	switch (draw_mode) {
+		case LINE:
+			WireFrameTriangle(projected[0], projected[1], projected[2], color);
+			break;
+		case FILLED:
+			FillTriangle(projected[0], projected[1], projected[2], color);
+			break;
+		default: break;
+	}
 }
 
 // TODO: Fix shrinkage of object when rotating

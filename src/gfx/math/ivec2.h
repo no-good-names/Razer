@@ -2,6 +2,8 @@
 #define IVEC2_H
 
 #include <stdint.h>
+#include <math.h>
+#include "../typedef.h"
 
 typedef struct {
     int32_t x, y;

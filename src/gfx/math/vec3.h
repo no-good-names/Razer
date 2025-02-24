@@ -46,9 +46,11 @@ INLINE float vec3_length(vec3 a) {
 }
 INLINE void vec3_normalize(vec3 a, vec3 out) {
 	float length = vec3_length(a);
-	out[0] = a[0] / length;
-	out[1] = a[1] / length;
-	out[2] = a[2] / length;
+	if (length > 0.0f) {
+		out[0] = a[0] / length;
+		out[1] = a[1] / length;
+		out[2] = a[2] / length;
+	}
 }
 INLINE void vec3_negate(vec3 v, vec3 out) {
 	out[0] = v[0] * -1;

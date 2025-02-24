@@ -34,5 +34,4 @@
 #define INLINE static inline __attribute((always_inline))
 #endif
 
-
 #endif //TYPEDEF_H

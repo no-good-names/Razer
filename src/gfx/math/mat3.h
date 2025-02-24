@@ -9,7 +9,7 @@
 
 typedef float mat3[3][3];
 
-#define MAT3_IDENTITY (mat3) { \
+#define MAT3_IDENTITY_INIT { \
 	{1, 0, 0}, \
 	{0, 1, 0}, \
 	{0, 0, 1} \

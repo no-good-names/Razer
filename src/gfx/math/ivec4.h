@@ -2,6 +2,8 @@
 #define IVEC4_H
 
 #include <stdint.h>
+#include <math.h>
+#include "../typedef.h"
 
 typedef struct IVector4 {
     int32_t x, y, z, w;

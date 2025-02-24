@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "../typedef.h"
+
 typedef struct iVector3_t {
     int32_t x, y, z;
 } iv3_t;
