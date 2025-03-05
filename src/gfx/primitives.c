@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void drawLine(const ivec2 start, const ivec2 end, const uint32_t color) {
+void DrawLine(const ivec2 start, const ivec2 end, const uint32_t color) {
 	if (start[0] == end[0] && start[1] == end[1]) {
 		setPixel(start[0], start[1], color);
 		return;
@@ -54,7 +54,7 @@ void FillTriangle(ivec2 a, ivec2 b, ivec2 c, uint32_t color) {
 	// Check for degenerate triangle (collapsed into a line or point)
 	int total_height = c[1] - a[1];
 	if (total_height == 0) {
-		drawLine(a, b, color);
+		DrawLine(a, b, color);
 		return;
 	}
 

@@ -27,12 +27,6 @@ typedef struct {
 } Object_t;
 
 typedef struct {
-	float scale;
-	vec3 rotation;
-	vec3 translation;
-} Transformations_t;
-
-typedef struct {
 	Object_t object;
 	Transformations_t transformations;
 } Instance_t;

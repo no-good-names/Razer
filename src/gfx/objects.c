@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "camera.h"
+#include "math/mat4.h"
 #include "math/maths.h"
 #include "math/vec3.h"
 
@@ -56,15 +57,11 @@ Scene_t create_scene(Instance_t *instances, const int numInstances) {
 	return scene;
 }
 
+// TODO: scale and rotate from (0, 0, 0) then add the center then translate to the final position
 void apply_transformation(Instance_t *instance, Transformations_t translation) {
 	for (int i = 0; i < instance->object.numVertices; i++) {
-		vec3 tmp;
-		vec3_cpy(instance->object.vertices[i], tmp);
-		vec3_scale(tmp, translation.scale, tmp);
-		rotate(tmp, translation.rotation, tmp);
-		vec3_cpy(tmp, instance->object.vertices[i]);
+		mat4_apply_transformation(instance->object.vertices[i], translation.scale, translation.rotation, translation.translation, instance->object.vertices[i]);
 	}
-	vec3_add(instance->object.center, translation.translation, instance->object.center);
 }
 
 
@@ -87,7 +84,7 @@ void renderObject(Object_t object) {
         vec3 tmp = {0};
         vec3_sub(object.center, g_camera.position, tmp);
         vec3_add(object.vertices[i], tmp, tmp);
-        rotate(tmp, g_camera.view_dir, tmp);
+        mat4_rotate_vec3(tmp, g_camera.view_dir, tmp);
         ProjectToCanvas(&projectedVertices[i], tmp);
     }
     for (int i = 0; i < object.numTriangles; i++) {

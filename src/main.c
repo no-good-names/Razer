@@ -124,63 +124,15 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     	if(keys[SDL_SCANCODE_ESCAPE]) {
 			running = false;
 		}
-    	if (keys[SDL_SCANCODE_W]) {
-    		vec3 backwards = {0};
-    		vec3_normalize( (vec3) {
-				sinf(g_camera.view_dir[0]),
-				sinf(g_camera.view_dir[1]),
-				cosf(g_camera.view_dir[0])
-			}, backwards);
-    		vec3_scale(backwards, 0.05f, backwards);
-    		vec3_add(g_camera.position, backwards, g_camera.position);
-    	}
-    	if (keys[SDL_SCANCODE_S]) {
-    		vec3 backwards = {0};
-    		vec3_normalize( (vec3) {
-				sinf(g_camera.view_dir[0]),
-				sinf(g_camera.view_dir[1]),
-				cosf(g_camera.view_dir[0])
-			}, backwards);
-    		vec3_scale(backwards, 0.05f, backwards);
-    		vec3_sub(g_camera.position, backwards, g_camera.position);
-    	}
-    	if (keys[SDL_SCANCODE_A]) {
 
-    		// Strafe right (perpendicular to the view direction)
-    		vec3 left = {0};
-    		vec3_normalize( (vec3) {
-				sinf(g_camera.view_dir[0] - M_PI_2),
-				0.0f,
-				cosf(g_camera.view_dir[0] - M_PI_2)
-			}, left);
-    		vec3_scale(left, 0.05f, left);
-    		vec3_add(g_camera.position, left, g_camera.position);
-    	}
-    	if (keys[SDL_SCANCODE_D]) {
-    		// Strafe right (perpendicular to the view direction)
-    		vec3 right = {0};
-    		vec3_normalize( (vec3) {
-				sinf(g_camera.view_dir[0] + M_PI_2),
-				0.0f,
-				cosf(g_camera.view_dir[0] + M_PI_2)
-			}, right);
-    		vec3_scale(right, 0.05f, right);
-    		vec3_add(g_camera.position, right, g_camera.position);
-    	}
-    	// TODO: FIX ROTATION
-    	if (keys[SDL_SCANCODE_RIGHT])
-    		g_camera.view_dir[1] += DEG2RAD(1.0f);
-    	if (keys[SDL_SCANCODE_LEFT])
-    		g_camera.view_dir[1] -= DEG2RAD(1.0f);
-
-    	apply_transformation(&scene.instances[0], (Transformations_t) {
-			.scale = 1.0f,
-			.rotation = {0.0f, 1.0f, 0.0f},
-			.translation = {0, 0, 0}});
-    	apply_transformation(&scene.instances[1], (Transformations_t) {
-			.scale = 1.0f,
-			.rotation = {0.0f, 1.0f, 0.0f},
-			.translation = {0, 0, 0}});
+   //  	apply_transformation(&scene.instances[0], (Transformations_t) {
+			// .scale = 1.0f,
+			// .rotation = {0.0f, 1.0f, 0.0f},
+			// .translation = {0, 0, 0}});
+   //  	apply_transformation(&scene.instances[1], (Transformations_t) {
+			// .scale = 1.0f,
+			// .rotation = {0.0f, 1.0f, 0.0f},
+			// .translation = {0, 0, 0}});
     	printf("%f\n", distance(scene.instances[1].object.vertices[0], scene.instances[1].object.vertices[1]));
 
     	// Rendering

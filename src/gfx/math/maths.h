@@ -1,4 +1,5 @@
 #ifndef MATHS_H
+#define MATHS_H
 
 #include <stdint.h>
 #include "vec2.h"
@@ -15,10 +16,10 @@
 #define DEG2RAD(deg) ((deg) * (PI / 180.0f))
 #define RAD2DEG(rad) ((rad) * (180.0f / PI))
 
-void rotateX(const vec3 v, float angle, vec3 out);
-void rotateY(const vec3 v, float angle, vec3 out);
-void rotateZ(const vec3 v, float angle, vec3 out);
-
-void rotate(const vec3 v, const vec3 rotation, vec3 out);
+typedef struct {
+	vec3 scale;
+	vec3 rotation; // rotate on x, y, z axis
+	vec3 translation;
+} Transformations_t;
 
 #endif
