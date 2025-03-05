@@ -15,6 +15,7 @@ static enum {
 } DrawMode;
 
 extern uint32_t draw_mode;
+extern vec3 world_position;
 
 typedef struct {
 	vec3 *vertices;
@@ -49,7 +50,7 @@ Scene_t create_scene(Instance_t *instances, int numInstances);
 
 void apply_transformation(Instance_t *instance, const Transformations_t translation);
 
-void renderObject(Object_t object);
+void RenderObject(Object_t object);
 void RenderScene(Scene_t scene);
 
 

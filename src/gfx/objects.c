@@ -13,6 +13,12 @@
 #include "math/vec3.h"
 
 uint32_t draw_mode = LINE;
+vec3 world_position = {0, 0, 0};
+
+// Debuging
+void GetWorldSpacePosition(vec3 pos) {
+	vec3_sub((vec3) {0, 0, 0}, g_camera.position, pos);
+}
 
 void ProjectToCanvas(ivec2 *dest, const vec3 v) {
     if (v[2] <= 0.0f) {
@@ -57,15 +63,21 @@ Scene_t create_scene(Instance_t *instances, const int numInstances) {
 	return scene;
 }
 
-// TODO: scale and rotate from (0, 0, 0) then add the center then translate to the final position
 void apply_transformation(Instance_t *instance, Transformations_t translation) {
 	for (int i = 0; i < instance->object.numVertices; i++) {
-		mat4_apply_transformation(instance->object.vertices[i], translation.scale, translation.rotation, translation.translation, instance->object.vertices[i]);
+		mat4 S, R, T, TRS;
+		mat4_scale((mat4) MAT4_IDENTITY_INIT, translation.scale, S);
+		mat4_rotate((mat4) MAT4_IDENTITY_INIT, translation.rotation, R);
+		mat4_translate((mat4) MAT4_IDENTITY_INIT, translation.translation, T);
+		mat4_mul_mat4(T, R, TRS);
+		mat4_mul_mat4(TRS, S, TRS);
+		mat4_mul_vec3(TRS, instance->object.vertices[i], instance->object.vertices[i]);
 	}
+	vec3_add(translation.translation, instance->object.center, instance->object.center);
 }
 
 
-void renderTriangle(ivec2 projected[3], uint32_t color) {
+void RenderTriangle(ivec2 projected[3], uint32_t color) {
 	switch (draw_mode) {
 		case LINE:
 			WireFrameTriangle(projected[0], projected[1], projected[2], color);
@@ -78,26 +90,26 @@ void renderTriangle(ivec2 projected[3], uint32_t color) {
 }
 
 // TODO: Fix shrinkage of object when rotating
-void renderObject(Object_t object) {
-    ivec2 projectedVertices[MAX_OBJECT_VERTICES];
+void RenderObject(Object_t object) {
+    ivec2 ProjectedVertices[MAX_OBJECT_VERTICES];
     for (int i = 0; i < object.numVertices; i++) {
         vec3 tmp = {0};
         vec3_sub(object.center, g_camera.position, tmp);
         vec3_add(object.vertices[i], tmp, tmp);
         mat4_rotate_vec3(tmp, g_camera.view_dir, tmp);
-        ProjectToCanvas(&projectedVertices[i], tmp);
+        ProjectToCanvas(&ProjectedVertices[i], tmp);
     }
     for (int i = 0; i < object.numTriangles; i++) {
-        ivec2 renderedTriangle[3];
-    	ivec2_cpy(projectedVertices[object.triangles[i][0]], renderedTriangle[0]);
-    	ivec2_cpy(projectedVertices[object.triangles[i][1]], renderedTriangle[1]);
-    	ivec2_cpy(projectedVertices[object.triangles[i][2]], renderedTriangle[2]);
-        renderTriangle(renderedTriangle, object.color[i]);
+        ivec2 RenderedTriangle[3];
+    	ivec2_cpy(ProjectedVertices[object.triangles[i][0]], RenderedTriangle[0]);
+    	ivec2_cpy(ProjectedVertices[object.triangles[i][1]], RenderedTriangle[1]);
+    	ivec2_cpy(ProjectedVertices[object.triangles[i][2]], RenderedTriangle[2]);
+        RenderTriangle(RenderedTriangle, object.color[i]);
     }
 }
 
 void RenderScene(Scene_t scene) {
 	for (int i = 0; i < scene.numInstances; i++) {
-		renderObject(scene.instances[i].object);
+		RenderObject(scene.instances[i].object);
 	}
 }
