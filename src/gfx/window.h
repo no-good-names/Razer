@@ -23,6 +23,7 @@ extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Texture *texture;
 extern bool running;
+extern uint8_t TRIANGLE_TYPE;
 
 #define PIXELS_SIZE screen_size[0] * screen_size[1] * sizeof(uint32_t)
 

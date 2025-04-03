@@ -12,5 +12,6 @@
 #include "primitives.h"
 #include "window.h"
 #include "math/maths.h"
+#include "object.h"
 
 #endif //GFX_H

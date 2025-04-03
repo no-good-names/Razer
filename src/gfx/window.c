@@ -67,7 +67,7 @@ void update_events() {
 
 void update_renderer() {
 	SDL_UpdateTexture(texture, NULL, pixels, screen_size[0] * sizeof(uint32_t));
-    SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_VERTICAL);
+    SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_NONE);
 	SDL_RenderPresent(renderer);
 }
 

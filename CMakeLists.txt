@@ -33,6 +33,8 @@ add_executable(razer_remake
         src/gfx/math/mat4.c
         src/gfx/math/mat4.h
         src/gfx/typedef.h
+        src/gfx/object.c
+        src/gfx/object.h
 )
 
 target_compile_definitions(razer_remake PRIVATE SDL_MAIN_HANDLED)

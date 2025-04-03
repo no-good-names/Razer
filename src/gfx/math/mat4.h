@@ -18,9 +18,9 @@ typedef float mat4[4][4];
 }
 
 INLINE void mat4_mul_vec3(const mat4 m, const vec3 v, vec3 out) {
-	out[0] = v[0]*m[0][0] + v[1]*m[0][1] + v[2]*m[0][2] + m[0][3];
-	out[1] = v[0]*m[1][0] + v[1]*m[1][1] + v[2]*m[1][2] + m[1][3];
-	out[2] = v[0]*m[2][0] + v[1]*m[2][1] + v[2]*m[2][2] + m[2][3];
+	out[0] = v[0] * m[0][0] + v[1] * m[0][1] + v[2] * m[0][2] + m[0][3];
+	out[1] = v[0] * m[1][0] + v[1] * m[1][1] + v[2] * m[1][2] + m[1][3];
+	out[2] = v[0] * m[2][0] + v[1] * m[2][1] + v[2] * m[2][2] + m[2][3];
 }
 
 INLINE void mat4_mul_mat4(const mat4 a, const mat4 b, mat4 out) {
@@ -43,6 +43,14 @@ INLINE void mat4_mul_mat4(const mat4 a, const mat4 b, mat4 out) {
 	out[3][1] = a[3][0]*b[0][1] + a[3][1]*b[1][1] + a[3][2]*b[2][1] + a[3][3]*b[3][1];
 	out[3][2] = a[3][0]*b[0][2] + a[3][1]*b[1][2] + a[3][2]*b[2][2] + a[3][3]*b[3][2];
 	out[3][3] = a[3][0]*b[0][3] + a[3][1]*b[1][3] + a[3][2]*b[2][3] + a[3][3]*b[3][3];
+}
+
+INLINE void mat4_cpy(const mat4 src, mat4 dest) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			dest[i][j] = src[i][j];
+		}
+	}
 }
 
 INLINE void vec3_to_mat4(const vec3 v, mat4 out) {

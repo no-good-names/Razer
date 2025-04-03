@@ -13,11 +13,11 @@
 #define RGBA(r, g, b, a) (uint32_t) ((a << 24) | (r << 16) | (g << 8) | b)
 
 #define swap(a, b) \
-{ \
-__typeof__(a) temp = a; \
-a = b; \
-b = temp; \
-}
+		{ \
+			__typeof__(a) temp = a; \
+			a = b; \
+			b = temp; \
+		}
 
 #define RED (uint32_t) 0xFFFF0000
 #define GREEN (uint32_t) 0xFF00FF00
