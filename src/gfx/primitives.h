@@ -24,15 +24,15 @@ INLINE void NormalizeToPixel(float x, float y, int32_t *outX, int32_t *outY) {
 	*outY = (int32_t)roundf((y) * 0.5f * (screen_size[1] - 1)); // Flip Y-axis
 }
 
-INLINE void SetPixel(int32_t x, int32_t y, const uint32_t color) {
+INLINE void SetPixel(const int32_t x, const int32_t y, const uint32_t color) {
 	// start at the middle of the screen
-	x += screen_size[0]/2;
-	y = (screen_size[1] / 2) - y - 1; // y flip
+	const int32_t tmp_x = x + screen_size[0]/2;
+	const int32_t tmp_y = (screen_size[1] / 2) - y - 1; // y flip
 	// Check if x or y is out of bounds of the screen if so return
-	if (x < 0 || x >= screen_size[0] || y < 0 || y >= screen_size[1]) {
+	if (tmp_x < 0 || tmp_x >= screen_size[0] || tmp_y < 0 || tmp_y >= screen_size[1]) {
 		return;
 	}
-	pixels[(y * screen_size[0]) + x] = color;
+	pixels[(tmp_y * screen_size[0]) + tmp_x] = color;
 }
 
 void DrawLine(const ivec2 start, const ivec2 end, uint32_t color);
