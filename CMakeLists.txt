@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
-project(razer_remake C)
+project(Razer C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -7,7 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(lib/SDL2)
 set(LIBS SDL2-static m)
 
-add_executable(razer_remake
+add_executable(Razer
         src/main.c
         src/gfx/typedef.h
         src/gfx/primitives.c
@@ -37,5 +37,5 @@ add_executable(razer_remake
         src/gfx/object.h
 )
 
-target_compile_definitions(razer_remake PRIVATE SDL_MAIN_HANDLED)
-target_link_libraries(razer_remake ${LIBS})
+target_compile_definitions(Razer PRIVATE SDL_MAIN_HANDLED)
+target_link_libraries(Razer ${LIBS})
