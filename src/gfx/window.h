@@ -23,6 +23,7 @@ extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Texture *texture;
 extern bool running;
+extern bool SHOW_FPS;
 extern uint8_t TRIANGLE_TYPE;
 
 #define PIXELS_SIZE screen_size[0] * screen_size[1] * sizeof(uint32_t)
@@ -31,5 +32,7 @@ void init_renderer(int width, int height);
 void update_events();
 void update_renderer();
 void destroy_renderer();
+void set_window_title(const char *title);
+void show_fps(bool show);
 
 #endif //WINDOW_H

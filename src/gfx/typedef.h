@@ -36,4 +36,6 @@
 #define INLINE static inline __attribute((always_inline))
 #endif
 
+#define RAND_RANGE(min, max) ((rand() % (max - min + 1)) + min)
+
 #endif //TYPEDEF_H

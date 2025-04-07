@@ -19,6 +19,7 @@ SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
 bool running = false;
 uint8_t TRIANGLE_TYPE = 0;
+bool SHOW_FPS = false;
 struct dt dt = {0, 0, 0};
 
 void init_renderer(const int width, const int height) {
@@ -31,7 +32,7 @@ void init_renderer(const int width, const int height) {
 		printf("SDL_Init Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-	window = SDL_CreateWindow("Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_size[0], screen_size[1], 0);
+	window = SDL_CreateWindow("Untitled", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screen_size[0], screen_size[1], 0);
 	if (window == NULL) {
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(1);
@@ -69,6 +70,11 @@ void update_renderer() {
 	SDL_UpdateTexture(texture, NULL, pixels, screen_size[0] * sizeof(uint32_t));
     SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_NONE);
 	SDL_RenderPresent(renderer);
+	if (SHOW_FPS) {
+		char title[256];
+		sprintf(title, "FPS: %d", (int) (1000.0f / dt.deltaTime));
+		SDL_SetWindowTitle(window, title);
+	}
 }
 
 void destroy_renderer() {
@@ -76,4 +82,12 @@ void destroy_renderer() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+void show_fps(const bool show) {
+	SHOW_FPS = show;
+}
+
+void set_window_title(const char *title) {
+	SDL_SetWindowTitle(window, title);
 }

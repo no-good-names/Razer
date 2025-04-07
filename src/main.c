@@ -50,6 +50,7 @@ uint32_t colors[12] = {
 
 int main(int argc, char *argv[]) {
 	init_renderer(800, 600);
+	set_window_title("Rasterizer Demo");
 
 	const Object_t object = CreateObject(vertices, indices, colors, 8, 12);
 
@@ -57,6 +58,7 @@ int main(int argc, char *argv[]) {
 	Instance_t instance1 = CreateInstance(object, (vec3) {1.5f, 0.0f, 6.0f}, (vec3) {0.0f, 0.0f, 0.0f}, (vec3) {1.0f, 1.0f, 1.0f});
 
 	SetDrawType(TRIANGLE_WIREFRAME);
+	show_fps(false);
 	while (running) {
 		update_events();
 		memset(pixels, 0, PIXELS_SIZE);
@@ -68,15 +70,8 @@ int main(int argc, char *argv[]) {
 		if (keys[SDL_SCANCODE_ESCAPE]) running = false;
 		if (keys[SDL_SCANCODE_1]) SetDrawType(TRIANGLE_WIREFRAME);
 		if (keys[SDL_SCANCODE_2]) SetDrawType(TRIANGLE_FILLED);
-		if (keys[SDL_SCANCODE_A]) {
-            instance.transformations.rotation[0] += 1.0f;
-        }
-		if (keys[SDL_SCANCODE_S]) {
-			instance.transformations.rotation[1] += 1.0f;
-		}
-		if (keys[SDL_SCANCODE_D]) {
-			instance.transformations.rotation[2] += 1.0f;
-		}
+		instance.transformations.rotation[0] += 1.0f;
+		instance1.transformations.rotation[1] += 1.0f;
 
 		update_renderer();
 	}
