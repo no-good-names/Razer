@@ -8,8 +8,8 @@
 #include "gfx/primitives.h"
 
 void project(const vec3 v, ivec2 out) {
-    out[0] = (v[0] + 1.) * get_screen_width() / 2;
-    out[1] = (v[1] + 1.) * get_screen_height() / 2;
+    out[0] = (v[0] + 1.) * screen_size[0] / 2;
+    out[1] = (v[1] + 1.) * screen_size[1] / 2;
 }
 
 void barycentric(ivec2 *pts, ivec2 P, vec3 out) {
@@ -29,13 +29,13 @@ void barycentric(ivec2 *pts, ivec2 P, vec3 out) {
         glm_vec3_copy((vec3){-1, 1, 1}, out);
         return;
     }
-    glm_vec3_copy((vec3){1.0f-(u[0]+u[1]/u[2]), u[1]/u[2], u[0]/u[2]}, out);
+    glm_vec3_copy((vec3){1.0f-((u[0]+u[1])/u[2]), u[1]/u[2], u[0]/u[2]}, out);
 }
 
 void triangle(ivec2 *pts, uint32_t color) {
-    ivec2 bboxmin = {get_screen_width()-1, get_screen_height()-1};
+    ivec2 bboxmin = {screen_size[0]-1, screen_size[1]-1};
     ivec2 bboxmax = {0, 0};
-    ivec2 clamp = {get_screen_width()-1, get_screen_height()-1};
+    ivec2 clamp = {screen_size[0]-1, screen_size[1]-1};
     for (int i = 0; i < 3; i++) {
         bboxmin[0] = glm_imax(0, glm_imin(bboxmin[0], pts[i][0]));
         bboxmin[1] = glm_imax(0, glm_imin(bboxmin[1], pts[i][1]));
@@ -64,10 +64,10 @@ void render_wireframe(vec3 *v, ivec3 *f, int face_count, uint32_t color) {
             vec3 v1;
             glm_vec3_copy(v1, v[face[(j + 1) % 3]]);
 
-            int x0 = (int)((v0[0] + 1.0f) * get_screen_width()  / 2.0f);
-            int y0 = (int)((v0[1] + 1.0f) * get_screen_height() / 2.0f);
-            int x1 = (int)((v1[0] + 1.0f) * get_screen_width()  / 2.0f);
-            int y1 = (int)((v1[1] + 1.0f) * get_screen_height() / 2.0f);
+            int x0 = (int)((v0[0] + 1.0f) * screen_size[0]  / 2.0f);
+            int y0 = (int)((v0[1] + 1.0f) * screen_size[1] / 2.0f);
+            int x1 = (int)((v1[0] + 1.0f) * screen_size[0]  / 2.0f);
+            int y1 = (int)((v1[1] + 1.0f) * screen_size[1] / 2.0f);
 
             draw_line(x0, y0, x1, y1, color);
         }
@@ -83,8 +83,8 @@ void render_triangle(vec3 *v, ivec3 *f, int face_count, uint32_t color) {
         for (int j = 0; j < 3; j++) {
             vec3 wc;
             glm_vec3_copy(v[face[j]], wc);
-            sc[j][0] = (int)((wc[0] + 1.0f) * get_screen_width()  / 2.0f);
-            sc[j][1] = (int)((wc[1] + 1.0f) * get_screen_height() / 2.0f);
+            sc[j][0] = (int)((wc[0] + 1.0f) * screen_size[0]  / 2.0f);
+            sc[j][1] = (int)((wc[1] + 1.0f) * screen_size[1] / 2.0f);
         }
         triangle(sc, color);
     }
@@ -95,8 +95,8 @@ int main(int argc, char *argv[]) {
     init_video(900, 600, 1);
     ivec2 pts[3] = {
         {450, 150},
-        {650, 450},
-        {250, 450}
+        {250, 450},
+        {650, 450}
     };
 
     while (!quit) {
