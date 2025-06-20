@@ -83,12 +83,10 @@ void render_triangle(vec3 *v, ivec3 *f, int face_count, uint32_t color) {
         for (int j = 0; j < 3; j++) {
             vec3 wc;
             glm_vec3_copy(v[face[j]], wc);
-            int x = (int)((wc[0] + 1.0f) * get_screen_width()  / 2.0f);
-            int y = (int)((wc[1] + 1.0f) * get_screen_height() / 2.0f);
-            sc[j][0] = x;
-            sc[j][1] = y;
+            sc[j][0] = (int)((wc[0] + 1.0f) * get_screen_width()  / 2.0f);
+            sc[j][1] = (int)((wc[1] + 1.0f) * get_screen_height() / 2.0f);
         }
-        triangle(sc, color);  // Assumes triangle takes ivec2[3]
+        triangle(sc, color);
     }
 }
 
@@ -96,34 +94,15 @@ void render_triangle(vec3 *v, ivec3 *f, int face_count, uint32_t color) {
 int main(int argc, char *argv[]) {
     init_video(900, 600, 1);
     ivec2 pts[3] = {
-        {10+700,10},
-        {100+700, 30},
-        {190+700, 160}
-    };
-    ivec2 pts1[3] = {
-        {10,10},
-        {100, 30},
-        {190, 160}
-    };
-
-    ivec2 pts2[3] = {
-        {10+700,10+400},
-        {100+700, 30+400},
-        {190+700, 160+400}
-    };
-    ivec2 pts3[3] = {
-        {10,10+400},
-        {100, 30+400},
-        {190, 160+400}
+        {450, 150},
+        {650, 450},
+        {250, 450}
     };
 
     while (!quit) {
         update_events();
 
         triangle(pts, 0xFF00FF00);
-        triangle(pts1, 0xFF0000FF);
-        triangle(pts2, 0xFFFF0000);
-        triangle(pts3, 0xFFFFFF00);
 
         update_video();
     }
