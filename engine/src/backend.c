@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 uint32_t *pixels = NULL;
+float *zbuffer = NULL;
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *texture = NULL;
@@ -51,7 +52,16 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
         printf("Failed to allocate memory for pixels\n");
         exit(1);
     }
+    zbuffer = (float *) malloc(w * h * sizeof(int));
+    if (zbuffer == NULL) {
+        printf("Failed to allocate memory for zbuffer\n");
+        exit(1);
+    }
     memset(pixels, 0, get_screen_width() * get_screen_height() * sizeof(uint32_t));
+
+    for (int i = screen_size[0] * screen_size[1]; i--;) {
+        zbuffer[i] = -FLT_MAX;
+    }
 }
 
 void update_events() {
@@ -76,6 +86,9 @@ void destroy_video() {
     fprintf(stderr, "Destroying video\n");
     if (pixels) {
         free(pixels);
+    }
+    if (zbuffer) {
+        free(zbuffer);
     }
     if (texture) {
         SDL_DestroyTexture(texture);

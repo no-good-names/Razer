@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 
 extern uint32_t *pixels;
+extern float *zbuffer;
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Texture *texture;

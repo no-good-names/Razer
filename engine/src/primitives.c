@@ -54,84 +54,56 @@ void draw_line(int ax, int ay, int bx, int by, const uint32_t color) {
     }
 }
 
-void project(const vec3 v, ivec2 out) {
-    out[0] = (v[0] + 1.) * screen_size[0] / 2;
-    out[1] = (v[1] + 1.) * screen_size[1] / 2;
+void project(const vec3 v, vec3 out) {
+    out[0] = (v[0] + 1.) * screen_size[0] / 2 + 0.5;
+    out[1] = (v[1] + 1.) * screen_size[1] / 2 + 0.5;
+    out[2] = v[2];
 }
 
-void barycentric(ivec2 *pts, ivec2 P, vec3 out) {
+void barycentric(vec3 A, vec3 B, vec3 C, vec3 P, vec3 out) {
     vec3 a = {
-        (float)(pts[2][0] - pts[0][0]),
-        (float)(pts[1][0] - pts[0][0]),
-        (float)(pts[0][0] - P[0])
+        C[0] - A[0],
+        B[0] - A[0],
+        A[0] - P[0]
     };
     vec3 b = {
-        (float)(pts[2][1] - pts[0][1]),
-        (float)(pts[1][1] - pts[0][1]),
-        (float)(pts[0][1] - P[1])
+        C[1] - A[1],
+        B[1] - A[1],
+        A[1] - P[1]
     };
     vec3 u;
     glm_vec3_cross(a, b, u);
-    if (fabsf(u[2]) < 1) {
-        glm_vec3_copy((vec3){-1, 1, 1}, out);
+    if (fabsf(u[2]) > 1e-2) {
+        glm_vec3_copy((vec3){1.0f-(u[0]+u[1])/u[2], u[1]/u[2], u[0]/u[2]}, out);
         return;
     }
-    glm_vec3_copy((vec3){1.0f-((u[0]+u[1])/u[2]), u[1]/u[2], u[0]/u[2]}, out);
+    glm_vec3_copy((vec3){-1, 1, 1}, out);
 }
 
-void triangle(ivec2 *pts, const uint32_t color) {
-    ivec2 bboxmin = {screen_size[0]-1, screen_size[1]-1};
-    ivec2 bboxmax = {0, 0};
-    ivec2 clamp = {screen_size[0]-1, screen_size[1]-1};
+void triangle(vec3 *pts, const uint32_t color) {
+    vec2 bboxmin = {  FLT_MAX,  FLT_MAX };
+    vec2 bboxmax = { -FLT_MAX, -FLT_MAX };
+    vec2 clamp = {screen_size[0]-1, screen_size[1]-1};
     for (int i = 0; i < 3; i++) {
-        bboxmin[0] = glm_imax(0, glm_imin(bboxmin[0], pts[i][0]));
-        bboxmin[1] = glm_imax(0, glm_imin(bboxmin[1], pts[i][1]));
-
-        bboxmax[0] = glm_imin(clamp[0], glm_imax(bboxmax[0], pts[i][0]));
-        bboxmax[1] = glm_imin(clamp[1], glm_imax(bboxmax[1], pts[i][1]));
+        for (int j = 0; j<2; j++) {
+            bboxmin[j] = glm_max(0.0f, glm_min(bboxmin[j], pts[i][j]));
+            bboxmax[j] = glm_min(clamp[j], glm_max(bboxmax[j], pts[i][j]));
+        }
     }
-    ivec2 P;
+    vec3 P;
     for (P[0] = bboxmin[0]; P[0] <= bboxmax[0]; P[0]++) {
         for (P[1] = bboxmin[1]; P[1] <= bboxmax[1]; P[1]++) {
             vec3 bc_screen;
-            barycentric(pts, P, bc_screen);
+            barycentric(pts[0], pts[1], pts[2], P, bc_screen);
             if (bc_screen[0] < 0 || bc_screen[1] < 0 || bc_screen[2] < 0) continue;
-            set_pixel(P[0], P[1], color);
+            P[2] = 0;
+            for (int i = 0; i<3; i++) {
+                P[2] += pts[i][2]*bc_screen[i];
+            }
+            if (zbuffer[(int)(P[0]+P[1]*screen_size[0])] < P[2]) {
+                zbuffer[(int)(P[0]+P[1]*screen_size[0])] = P[2];
+                set_pixel(P[0], P[1], color);
+            }
         }
-    }
-}
-
-void render_wireframe(vec3 *v, ivec3 *f, const int face_count, const uint32_t color) {
-    for (int i = 0; i < face_count; i++) {
-        ivec3 face;
-        glm_ivec3_copy(f[i], face);
-        for (int j = 0; j < 3; j++) {
-            vec3 v0;
-            glm_vec3_copy(v[face[j]], v0);
-            vec3 v1;
-            glm_vec3_copy(v[face[(j + 1) % 3]], v1);
-
-            int x0 = (int)((v0[0] + 1.0f) * screen_size[0]  / 2.0f);
-            int y0 = (int)((v0[1] + 1.0f) * screen_size[1] / 2.0f);
-            int x1 = (int)((v1[0] + 1.0f) * screen_size[0]  / 2.0f);
-            int y1 = (int)((v1[1] + 1.0f) * screen_size[1] / 2.0f);
-
-            draw_line(x0, y0, x1, y1, color);
-        }
-    }
-}
-
-void render_triangle(vec3 *v, ivec3 *f, const int face_count, const uint32_t color) {
-    for (int i = 0; i < face_count; i++) {
-        ivec3 face;
-        glm_ivec3_copy(f[i], face);
-        ivec2 sc[3];
-        for (int j = 0; j < 3; j++) {
-            vec3 wc;
-            glm_vec3_copy(v[face[j]], wc);
-            sc[j][0] = (int)((wc[0] + 1.0f) * screen_size[0]  / 2.0f);
-            sc[j][1] = (int)((wc[1] + 1.0f) * screen_size[1] / 2.0f);
-        }
-        triangle(sc, color);
     }
 }
