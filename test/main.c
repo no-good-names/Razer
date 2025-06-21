@@ -9,11 +9,6 @@ uint32_t color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 
 int main(int argc, char *argv[]) {
     init_video(800, 600, 1);
-    vec3 pts[3] = {
-        {450, 150},
-        {250, 450},
-        {650, 450}
-    };
 
     const vec3 v[9] = {
         {0.5f, -0.5f, 0.0f},
@@ -35,8 +30,17 @@ int main(int argc, char *argv[]) {
         {6, 7, 8}
     };
 
+    uint32_t colors[3] = {
+        color(255, 0, 0, 255),
+        color(0, 255, 0, 255),
+        color(0, 0, 255, 255)
+    };
+
     while (!quit) {
         update_events();
+        // clear screen (pixel and z-buffer) every frame
+        clear_screen();
+
         for (int i = 0; i<3; i++) {
             ivec3 face;
             glm_ivec3_copy(f[i], face);
@@ -44,7 +48,7 @@ int main(int argc, char *argv[]) {
             for (int j = 0; j<3; j++) {
                 project(v[face[j]], pts[j]);
             }
-            triangle(pts, color(rand()%255, rand()%255, rand()%255, 255));
+            triangle(pts, colors[i]);
         }
 
         update_video();

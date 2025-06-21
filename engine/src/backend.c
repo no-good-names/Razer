@@ -58,7 +58,6 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
         exit(1);
     }
     memset(pixels, 0, get_screen_width() * get_screen_height() * sizeof(uint32_t));
-
     for (int i = screen_size[0] * screen_size[1]; i--;) {
         zbuffer[i] = -FLT_MAX;
     }

@@ -35,4 +35,15 @@ static void clear_pixel_buffer() {
     memset(pixels, 1, get_screen_width() * get_screen_height() * sizeof(uint32_t));
 }
 
+static void clear_zbuffer() {
+    for (int i = screen_size[0] * screen_size[1]; i--;) {
+        zbuffer[i] = -FLT_MAX;
+    }
+}
+
+static void clear_screen() {
+    clear_pixel_buffer();
+    clear_zbuffer();
+}
+
 #endif
