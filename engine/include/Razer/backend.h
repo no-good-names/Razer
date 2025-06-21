@@ -1,8 +1,9 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
+#include <stdbool.h>
 #include <stdint.h>
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 extern uint32_t *pixels;
 extern float *depth_buffer;

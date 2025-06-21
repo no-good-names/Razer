@@ -10,9 +10,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 
-add_subdirectory(lib/sdl3 EXCLUDE_FROM_ALL)
+add_subdirectory(lib/sdl2 EXCLUDE_FROM_ALL)
 add_subdirectory(lib/cglm EXCLUDE_FROM_ALL)
-set(LIBS SDL3::SDL3 cglm)
+set(LIBS SDL2-static cglm)
 
 if (UNIX AND NOT APPLE)
     list(APPEND LIBS m)

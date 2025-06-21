@@ -1,6 +1,6 @@
 #include <Razer/backend.h>
 #include <stdint.h>
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,18 +36,18 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
     for (int i = 0; i < get_screen_width() * get_screen_height(); i++) {
         depth_buffer[i] = 1.0f;
     }
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		printf("SDL_Init Error: %s\n", SDL_GetError());
 		exit(1);
 
 	}
-    window = SDL_CreateWindow("Demo", (uint32_t) w * window_scale, (uint32_t) h * window_scale, 0);
+    window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (uint32_t) w * window_scale, (uint32_t) h * window_scale, 0);
     SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     if (window == NULL) {
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-    renderer = SDL_CreateRenderer(window, NULL);
+    renderer = SDL_CreateRenderer(window, NULL, 0);
     if (renderer == NULL) {
 		printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
 		exit(1);
@@ -57,7 +57,6 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
 		printf("SDL_CreateTexture Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     quit = false;
     fprintf(stderr, "Video initialized successfully\n");
     fprintf(stderr, "Window size: %d x %d\n", window_size[0], window_size[1]);
@@ -68,7 +67,7 @@ void update_events() {
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
         switch(event.type) {
-            case SDL_EVENT_QUIT:
+            case SDL_QUIT:
                 quit = true;
                 break;
         }
@@ -78,7 +77,7 @@ void update_events() {
 void update_video() {
     SDL_UpdateTexture(texture, NULL, pixels, get_screen_width() * sizeof(uint32_t));
     //SDL_RenderTexture(renderer, texture, NULL, NULL);
-    SDL_RenderTextureRotated(renderer, texture, NULL, NULL, 0.0f, NULL, SDL_FLIP_VERTICAL);
+    SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0.0f, NULL, SDL_FLIP_VERTICAL);
     SDL_RenderPresent(renderer);
 }
 

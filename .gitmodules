@@ -1,6 +1,7 @@
 [submodule "lib/cglm"]
 	path = engine/lib/cglm
 	url = https://github.com/recp/cglm
-[submodule "lib/sdl3"]
-	path = engine/lib/sdl3
+[submodule "engine/lib/sdl2"]
+	path = engine/lib/sdl2
 	url = https://github.com/libsdl-org/SDL
+	branch = SDL2
