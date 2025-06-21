@@ -77,7 +77,8 @@ void update_events() {
 
 void update_video() {
     SDL_UpdateTexture(texture, NULL, pixels, get_screen_width() * sizeof(uint32_t));
-    SDL_RenderTexture(renderer, texture, NULL, NULL);
+    //SDL_RenderTexture(renderer, texture, NULL, NULL);
+    SDL_RenderTextureRotated(renderer, texture, NULL, NULL, 0.0f, NULL, SDL_FLIP_VERTICAL);
     SDL_RenderPresent(renderer);
 }
 
@@ -85,19 +86,15 @@ void destroy_video() {
     fprintf(stderr, "Destroying video\n");
     if (pixels) {
         free(pixels);
-        pixels = NULL;
     }
     if (texture) {
         SDL_DestroyTexture(texture);
-        texture = NULL;
     }
     if (renderer) {
         SDL_DestroyRenderer(renderer);
-        renderer = NULL;
     }
     if (window) {
         SDL_DestroyWindow(window);
-        window = NULL;
     }
     fprintf(stderr, "Video destroyed successfully\n");
     fprintf(stderr, "Exiting...\n");

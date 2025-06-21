@@ -4,11 +4,11 @@
 
 #include <cglm/cglm.h>
 
-#include "gfx/backend.h"
-#include "gfx/primitives.h"
+#include "engine/backend.h"
+#include "engine/primitives.h"
 
 int main(int argc, char *argv[]) {
-    init_video(450, 300, 2);
+    init_video(800, 600, 1);
     // ivec2 pts[3] = {
     //     {450, 150},
     //     {250, 450},
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
         // triangle(pts, 0xFF00FF00);
         render_triangle(v, f, 1, 0xFF00FF00);
-        render_wireframe(v, f, 1, 0xFFFF0000);
+        // render_wireframe(v, f, 1, 0xFFFF0000);
 
         update_video();
     }

@@ -12,12 +12,12 @@ add_subdirectory(lib/cglm EXCLUDE_FROM_ALL)
 set(LIBS SDL3::SDL3 cglm m)
 
 add_executable(Razer src/main.c
-        src/gfx/backend.c
-        src/gfx/backend.h
-        src/gfx/primitives.c
-        src/gfx/primitives.h
-        src/misc/misc.c
-        src/misc/misc.h
+        src/engine/backend.c
+        src/engine/backend.h
+        src/engine/primitives.c
+        src/engine/primitives.h
+        src/engine/misc/misc.c
+        src/engine/misc/misc.h
 )
 
 target_link_libraries(Razer ${LIBS})

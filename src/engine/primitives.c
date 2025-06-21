@@ -7,7 +7,7 @@
 
 #include <cglm/cglm.h>
 
-#include "../misc/misc.h"
+#include "misc/misc.h"
 
 void set_pixel(const int32_t x, const int32_t y, const uint32_t color) {
     // Check if x or y is out of bounds
