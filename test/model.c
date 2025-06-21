@@ -4,6 +4,8 @@
 
 #include "model.h"
 
+#include <stdio.h>
+
 void read_obj_file(Model_t *model, char *filename) {
 	FILE *file;
 }

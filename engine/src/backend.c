@@ -1,4 +1,4 @@
-#include "backend.h"
+#include <Razer/backend.h>
 #include <stdint.h>
 #include <SDL3/SDL.h>
 #include <stdbool.h>
@@ -58,7 +58,7 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
 		exit(1);
 	}
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
-    bool quit = false;
+    quit = false;
     fprintf(stderr, "Video initialized successfully\n");
     fprintf(stderr, "Window size: %d x %d\n", window_size[0], window_size[1]);
     fprintf(stderr, "Screen size: %d x %d\n", screen_size[0], screen_size[1]);

@@ -1,11 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL3/SDL.h>
 
-#include <cglm/cglm.h>
-
-#include "engine/backend.h"
-#include "engine/primitives.h"
+#include <Razer/Razer.h>
 
 int main(int argc, char *argv[]) {
     init_video(800, 600, 1);
