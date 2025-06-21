@@ -6,7 +6,6 @@
 #include <SDL2/SDL.h>
 
 extern uint32_t *pixels;
-extern float *depth_buffer;
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
 extern SDL_Texture *texture;
@@ -18,20 +17,20 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale);
 void update_events();
 void update_video();
 void destroy_video();
-static inline int get_screen_width() {
+static int get_screen_width() {
     return screen_size[0];
 }
-static inline int get_screen_height() {
+static int get_screen_height() {
     return screen_size[1];
 }
-static inline int get_window_width() {
+static int get_window_width() {
     return window_size[0];
 }
-static inline int get_window_height() {
+static int get_window_height() {
     return window_size[1];
 }
 
-static inline void clear_pixel_buffer() {
+static void clear_pixel_buffer() {
     memset(pixels, 1, get_screen_width() * get_screen_height() * sizeof(uint32_t));
 }
 
