@@ -54,7 +54,7 @@ void draw_line(int ax, int ay, int bx, int by, const uint32_t color) {
     }
 }
 
-void project(const vec3 v, vec3 out) {
+void world_to_screen(const vec3 v, vec3 out) {
     out[0] = (v[0] + 1.) * screen_size[0] / 2 + 0.5;
     out[1] = (v[1] + 1.) * screen_size[1] / 2 + 0.5;
     out[2] = v[2];
@@ -105,5 +105,18 @@ void triangle(vec3 *pts, const uint32_t color) {
                 set_pixel(P[0], P[1], color);
             }
         }
+    }
+}
+
+void render_triangle(vec3 *v, ivec3 *f, int nFaces, uint32_t *colors) {
+    for (int i = 0; i<nFaces; i++) {
+        ivec3 face;
+        glm_ivec3_copy(f[i], face);
+        vec3 pts[3];
+        for (int j = 0; j<3; j++) {
+            world_to_screen(v[face[j]], pts[j]);
+        }
+        // colors will be replaced with shaders later
+        triangle(pts, colors[i]);
     }
 }
