@@ -4,21 +4,10 @@ project(Razer C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+add_subdirectory(engine EXCLUDE_FROM_ALL)
+set(LIBS Razer-Engine)
 
-add_subdirectory(lib/sdl3 EXCLUDE_FROM_ALL)
-add_subdirectory(lib/cglm EXCLUDE_FROM_ALL)
-set(LIBS SDL3::SDL3 cglm m)
+add_executable(Razer test/main.c)
 
-add_executable(Razer src/main.c
-        src/engine/backend.c
-        src/engine/backend.h
-        src/engine/primitives.c
-        src/engine/primitives.h
-        src/engine/misc/misc.c
-        src/engine/misc/misc.h
-)
-
-target_link_libraries(Razer ${LIBS})
+target_link_libraries(Razer PRIVATE ${LIBS})
 

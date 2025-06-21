@@ -2,12 +2,11 @@
 // Created by carp on 6/18/25.
 //
 
-#include "primitives.h"
-#include "backend.h"
+#include <Razer/primitives.h>
+#include <Razer/backend.h>
+#include <Razer/misc/misc.h>
 
 #include <cglm/cglm.h>
-
-#include "misc/misc.h"
 
 void set_pixel(const int32_t x, const int32_t y, const uint32_t color) {
     // Check if x or y is out of bounds
