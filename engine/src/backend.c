@@ -47,7 +47,7 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-    renderer = SDL_CreateRenderer(window, NULL, 0);
+    renderer = SDL_CreateRenderer(window, 0, 0);
     if (renderer == NULL) {
 		printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
 		exit(1);
