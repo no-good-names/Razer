@@ -10,4 +10,3 @@ set(LIBS Razer-Engine)
 add_executable(Razer test/main.c)
 
 target_link_libraries(Razer PRIVATE ${LIBS})
-

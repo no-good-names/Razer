@@ -15,7 +15,7 @@ int screen_size[2] = {0, 0};
 int window_size[2] = {0, 0};
 float aspect_ratio[2] = {0.0f, 0.0f};
 
-void init_video(uint16_t w, uint16_t h, uint16_t window_scale) {
+void init_video(const uint16_t w, const uint16_t h, const uint16_t window_scale) {
     fprintf(stderr, "Initializing video with %d x %d\n", w, h);
     screen_size[0] = w;
     screen_size[1] = h;
@@ -70,13 +70,13 @@ void update_events() {
             case SDL_QUIT:
                 quit = true;
                 break;
+            default: break;
         }
     }
 }
 
 void update_video() {
     SDL_UpdateTexture(texture, NULL, pixels, get_screen_width() * sizeof(uint32_t));
-    //SDL_RenderTexture(renderer, texture, NULL, NULL);
     SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0.0f, NULL, SDL_FLIP_VERTICAL);
     SDL_RenderPresent(renderer);
 }
