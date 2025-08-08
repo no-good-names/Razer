@@ -63,6 +63,11 @@ void init_video(const uint16_t w, const uint16_t h, const uint16_t window_scale)
     }
 }
 
+void key_scancode() {
+    const uint8_t *key = SDL_GetKeyboardState(NULL);
+    if (key[SDL_SCANCODE_ESCAPE]) {}
+}
+
 void update_events() {
     SDL_Event event;
     while(SDL_PollEvent(&event)) {

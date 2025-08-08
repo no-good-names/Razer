@@ -8,6 +8,8 @@
 
 #include <cglm/cglm.h>
 
+int render_mode = 0;
+
 void set_pixel(const int32_t x, const int32_t y, const uint32_t color) {
     // Check if x or y is out of bounds
     if (x < 0 || x >= get_screen_width() || y < 0 || y >= get_screen_height())
@@ -80,7 +82,7 @@ void barycentric(vec3 A, vec3 B, vec3 C, vec3 P, vec3 out) {
     glm_vec3_copy((vec3){-1, 1, 1}, out);
 }
 
-void triangle(vec3 *pts, const uint32_t color) {
+void rasterized_triangle(vec3 *pts, const uint32_t color) {
     vec2 bboxmin = {  FLT_MAX,  FLT_MAX };
     vec2 bboxmax = { -FLT_MAX, -FLT_MAX };
     vec2 clamp = {screen_size[0]-1, screen_size[1]-1};
@@ -108,7 +110,18 @@ void triangle(vec3 *pts, const uint32_t color) {
     }
 }
 
-void render_triangle(vec3 *v, ivec3 *f, int nFaces, uint32_t *colors) {
+void wireframe_triangle(vec3 *pts, uint32_t color) {
+    draw_line((int)pts[0][0], (int)pts[0][1],
+              (int)pts[1][0], (int)pts[1][1], color);
+
+    draw_line((int)pts[1][0], (int)pts[1][1],
+              (int)pts[2][0], (int)pts[2][1], color);
+
+    draw_line((int)pts[2][0], (int)pts[2][1],
+              (int)pts[0][0], (int)pts[0][1], color);
+}
+
+void render_triangle(const vec3 *v, ivec3 *f, const int nFaces, const uint32_t *colors) {
     for (int i = 0; i<nFaces; i++) {
         ivec3 face;
         glm_ivec3_copy(f[i], face);
@@ -117,6 +130,9 @@ void render_triangle(vec3 *v, ivec3 *f, int nFaces, uint32_t *colors) {
             world_to_screen(v[face[j]], pts[j]);
         }
         // colors will be replaced with shaders later
-        triangle(pts, colors[i]);
+        if (render_mode == TRIANGLE_WIREFRAME)
+            wireframe_triangle(pts, colors[i]);
+        else
+            rasterized_triangle(pts, colors[i]);
     }
 }
