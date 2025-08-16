@@ -18,32 +18,16 @@ void init_video(uint16_t w, uint16_t h, uint16_t window_scale);
 void update_events();
 void update_video();
 void destroy_video();
-static int get_screen_width() {
-    return screen_size[0];
-}
-static int get_screen_height() {
-    return screen_size[1];
-}
-static int get_window_width() {
-    return window_size[0];
-}
-static int get_window_height() {
-    return window_size[1];
-}
 
-static void clear_pixel_buffer() {
-    memset(pixels, 1, get_screen_width() * get_screen_height() * sizeof(uint32_t));
-}
+static int get_screen_width() { return screen_size[0]; }
+static int get_screen_height() { return screen_size[1]; }
+static int get_window_width() { return window_size[0]; }
+static int get_window_height() { return window_size[1]; }
 
-static void clear_zbuffer() {
-    for (int i = screen_size[0] * screen_size[1]; i--;) {
-        zbuffer[i] = -FLT_MAX;
-    }
-}
+static void clear_pixel_buffer();
 
-static void clear_screen() {
-    clear_pixel_buffer();
-    clear_zbuffer();
-}
+static void clear_zbuffer();
+
+void clear_screen();
 
 #endif

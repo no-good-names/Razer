@@ -10,47 +10,47 @@
 
 int render_mode = 0;
 
-void set_pixel(const int32_t x, const int32_t y, const uint32_t color) {
+void draw_pixel(const int32_t x, const int32_t y, const uint32_t color) {
     // Check if x or y is out of bounds
     if (x < 0 || x >= get_screen_width() || y < 0 || y >= get_screen_height())
         return;
     pixels[(y * get_screen_width()) + x] = color;
 }
 
-void get_pixel(const int32_t x, const int32_t y, uint32_t *color) {
+// returns the pixel's value (color 0xRRGGBBAA)
+uint32_t get_pixel(const int32_t x, const int32_t y) {
     // Check if x or y is out of bounds
-    if (x < 0 || y >= get_screen_width() || y < 0 || y >= get_screen_height()) {
-        return;
-    }
-    *color = pixels[(y * get_screen_width()) + x];
+    if (x < 0 || x >= get_screen_width() || y < 0 || y >= get_screen_height())
+        return 0;
+    return pixels[y * get_screen_width() + x];
 }
 
-void draw_line(int ax, int ay, int bx, int by, const uint32_t color) {
+void draw_2d_line(int x0, int y0, int x1, int y1, const uint32_t color) {
     bool steep = false;
-    if (abs(ax - bx) < abs(ay - by)) {
-        iswap(ax, ay);
-        iswap(bx, by);
+    if (abs(x0 - x1) < abs(y0 - y1)) {
+        iswap(x0, y0);
+        iswap(x1, y1);
         steep = true;
     }
-    if (ax > bx) {
-        iswap(ax, bx);
-        iswap(ay, by);
+    if (x0 > x1) {
+        iswap(x0, x1);
+        iswap(y0, y1);
     }
 
-    const int dx = bx - ax;
-    const int dy = by - ay;
+    const int dx = x1 - x0;
+    const int dy = y1 - y0;
     const int derror2 = abs(dy) * 2;
     int error2 = 0;
-    int y = ay;
-    for (int x = ax; x <= bx; x++) {
+    int y = y0;
+    for (int x = x0; x <= x1; x++) {
         if (steep)
-            set_pixel(y, x, color);
+            draw_pixel(y, x, color);
         else
-            set_pixel(x, y, color);
+            draw_pixel(x, y, color);
 
         error2 += derror2;
         if (error2 > dx) {
-            y += (by > ay) ? 1 : -1;
+            y += (y1 > y0) ? 1 : -1;
             error2 -= dx * 2;
         }
     }
@@ -85,7 +85,7 @@ void barycentric(vec3 A, vec3 B, vec3 C, vec3 P, vec3 out) {
 void rasterized_triangle(vec3 *pts, const uint32_t color) {
     vec2 bboxmin = {  FLT_MAX,  FLT_MAX };
     vec2 bboxmax = { -FLT_MAX, -FLT_MAX };
-    vec2 clamp = {screen_size[0]-1, screen_size[1]-1};
+    const vec2 clamp = {(float)screen_size[0]-1, (float)screen_size[1]-1};
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j<2; j++) {
             bboxmin[j] = glm_max(0.0f, glm_min(bboxmin[j], pts[i][j]));
@@ -99,25 +99,26 @@ void rasterized_triangle(vec3 *pts, const uint32_t color) {
             barycentric(pts[0], pts[1], pts[2], P, bc_screen);
             if (bc_screen[0] < 0 || bc_screen[1] < 0 || bc_screen[2] < 0) continue;
             P[2] = 0;
-            for (int i = 0; i<3; i++) {
-                P[2] += pts[i][2]*bc_screen[i];
-            }
-            if (zbuffer[(int)(P[0]+P[1]*screen_size[0])] < P[2]) {
-                zbuffer[(int)(P[0]+P[1]*screen_size[0])] = P[2];
-                set_pixel(P[0], P[1], color);
+            for (int i = 0; i<3; i++) P[2] += pts[i][2]*bc_screen[i];
+            if (zbuffer[((int)P[0]+((int)P[1]*screen_size[0]))] < P[2]) {
+                zbuffer[((int)P[0]+((int)P[1]*screen_size[0]))] = P[2];
+                // replace with shader stuff
+                draw_pixel((int32_t)P[0], (int32_t)P[1], color);
             }
         }
     }
 }
 
-void wireframe_triangle(vec3 *pts, uint32_t color) {
-    draw_line((int)pts[0][0], (int)pts[0][1],
+
+// TODO: Replace 2D lines with 3D space lines
+void wireframe_triangle(const vec3 *pts, const uint32_t color) {
+    draw_2d_line((int)pts[0][0], (int)pts[0][1],
               (int)pts[1][0], (int)pts[1][1], color);
 
-    draw_line((int)pts[1][0], (int)pts[1][1],
+    draw_2d_line((int)pts[1][0], (int)pts[1][1],
               (int)pts[2][0], (int)pts[2][1], color);
 
-    draw_line((int)pts[2][0], (int)pts[2][1],
+    draw_2d_line((int)pts[2][0], (int)pts[2][1],
               (int)pts[0][0], (int)pts[0][1], color);
 }
 

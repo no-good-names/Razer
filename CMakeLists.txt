@@ -7,6 +7,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(engine EXCLUDE_FROM_ALL)
 set(LIBS Razer-Engine)
 
-add_executable(Razer test/main.c)
+add_executable(Razer test/main.c
+        test/model.c
+        test/model.h)
 
 target_link_libraries(Razer PRIVATE ${LIBS})

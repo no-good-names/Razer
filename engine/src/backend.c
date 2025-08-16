@@ -52,14 +52,14 @@ void init_video(const uint16_t w, const uint16_t h, const uint16_t window_scale)
         printf("Failed to allocate memory for pixels\n");
         exit(1);
     }
-    zbuffer = (float *) malloc(w * h * sizeof(int));
+    zbuffer = (float *) malloc(w * h * sizeof(float));
     if (zbuffer == NULL) {
         printf("Failed to allocate memory for zbuffer\n");
         exit(1);
     }
     memset(pixels, 0, get_screen_width() * get_screen_height() * sizeof(uint32_t));
     for (int i = screen_size[0] * screen_size[1]; i--;) {
-        zbuffer[i] = -FLT_MAX;
+        zbuffer[i] = FLT_MAX;
     }
 }
 
@@ -107,4 +107,19 @@ void destroy_video() {
     fprintf(stderr, "Exiting...\n");
     SDL_Quit();
     exit(0);
+}
+
+static void clear_pixel_buffer() {
+    memset(pixels, 0, screen_size[0] * screen_size[1] * sizeof(uint32_t));
+}
+
+static void clear_zbuffer() {
+    for (int i = screen_size[0] * screen_size[1]; i--;) {
+        zbuffer[i] = -FLT_MAX;
+    }
+}
+
+void clear_screen() {
+    clear_zbuffer();
+    clear_pixel_buffer();
 }
