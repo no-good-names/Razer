@@ -11,21 +11,21 @@
 #define TRIANGLE_WIREFRAME 0x00
 #define TRIANGLE_RASTERIZE 0x01
 
-extern int render_mode;
+struct global_camera_state {
+	mat4 projection;
+	mat4 view;
+	mat4 view_projection;
+};
 
-static void set_render_mode(int mode) {
-	switch (mode) {
-		case TRIANGLE_WIREFRAME:
-			render_mode = TRIANGLE_WIREFRAME;
-			break;
-		case TRIANGLE_RASTERIZE:
-			render_mode = TRIANGLE_RASTERIZE;
-			break;
-		default: break;
-	}
-}
+void set_render_mode(int mode);
 
-void draw_pixel(int32_t x, int32_t y, uint32_t color);
+void set_projection(mat4 *projection);
+void set_view(mat4 *view);
+void get_projection(mat4 *view_projection);
+
+void draw_2d_pixel(int32_t x, int32_t y, uint32_t color);
+void draw_3d_pixel(float x, float y, float z, uint32_t color);
+
 uint32_t get_pixel(int32_t x, int32_t y);
 void draw_2d_line(int x0, int y0, int x1, int y1, uint32_t color);
 void world_to_screen(const vec3 v, vec3 out);

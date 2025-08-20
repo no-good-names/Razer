@@ -23,8 +23,6 @@ add_library(Razer-Engine STATIC
         src/primitives.c
         src/misc/misc.c
         include/Razer/misc/misc.h
-        src/perspective.c
-        include/Razer/perspective.h
 )
 
 target_link_libraries(Razer-Engine PUBLIC ${LIBS})

@@ -7,9 +7,8 @@
  * THIS IS THE TEST FILE NOT THE LIBRARY
  */
 
-int main(int argc, char *argv[]) {
-    init_video(800, 600, 1);
-
+int main() {
+    init_video(800, 600, 800, 600);
 
     //      btl4              btr5
     //
@@ -45,8 +44,8 @@ int main(int argc, char *argv[]) {
         {0, 2, 6},
         {4, 5, 1},
         {4, 0, 1},
-        {6, 7, 3},
-        {6, 2, 3}
+        {6, 7, 2},
+        {7, 2, 3}
     };
 
     uint32_t colors[12] = {
@@ -69,7 +68,7 @@ int main(int argc, char *argv[]) {
     mat4 projection;
     glm_perspective(glm_rad(60.0f), 800.0f/600.0f, 0.1f, 100.0f, projection);
 
-    while (!quit) {
+    while (!get_backend_state()->quit) {
         angle += 0.5f;
         update_events();
         // clear screen (pixel and z-buffer) every frame
@@ -98,7 +97,7 @@ int main(int argc, char *argv[]) {
 
         const uint8_t *key = SDL_GetKeyboardState(NULL);
         if (key[SDL_SCANCODE_ESCAPE]) {
-            quit = 1;
+            get_backend_state()->quit = 1;
         }
         if (key[SDL_SCANCODE_1]) {
             set_render_mode(TRIANGLE_RASTERIZE);

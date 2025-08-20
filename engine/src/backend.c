@@ -5,61 +5,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-uint32_t *pixels = NULL;
-float *zbuffer = NULL;
-SDL_Window *window = NULL;
-SDL_Renderer *renderer = NULL;
-SDL_Texture *texture = NULL;
-bool quit = false;
-int screen_size[2] = {0, 0};
-int window_size[2] = {0, 0};
-float aspect_ratio[2] = {0.0f, 0.0f};
+struct global_backend g_backend;
 
-void init_video(const uint16_t w, const uint16_t h, const uint16_t window_scale) {
-    fprintf(stderr, "Initializing video with %d x %d\n", w, h);
-    screen_size[0] = w;
-    screen_size[1] = h;
-    window_size[0] = w * window_scale;
-    window_size[1] = h * window_scale;
+struct global_backend *get_backend_state() {
+    return &g_backend;
+}
+
+void init_video(uint16_t window_width, uint16_t window_height,
+	uint16_t screen_width, uint16_t screen_height) {
+    fprintf(stderr, "Initializing video with d%d x %d\n", screen_width, screen_height);
+    g_backend.screen_size[0] = screen_width;
+    g_backend.screen_size[1] = screen_height;
+    g_backend.window_size[0] = window_width;
+    g_backend.window_size[1] = window_height;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		printf("SDL_Init Error: %s\n", SDL_GetError());
 		exit(1);
 
 	}
-    window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w * window_scale,
-        h * window_scale, 0);
-    if (window == NULL) {
+    g_backend.window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width,
+        window_height, 0);
+    if (g_backend.window == NULL) {
 		printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-    renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == NULL) {
+    g_backend.renderer = SDL_CreateRenderer(g_backend.window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (g_backend.renderer == NULL) {
 		printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
 		exit(1);
 	}
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-        screen_size[0], screen_size[1]);
-    if (texture == NULL) {
+    g_backend.texture = SDL_CreateTexture(g_backend.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+        g_backend.screen_size[0], g_backend.screen_size[1]);
+    if (g_backend.texture == NULL) {
 		printf("SDL_CreateTexture Error: %s\n", SDL_GetError());
 		exit(1);
 	}
     fprintf(stderr, "Video initialized successfully\n");
-    fprintf(stderr, "Window size: %d x %d\n", window_size[0], window_size[1]);
-    fprintf(stderr, "Screen size: %d x %d\n", screen_size[0], screen_size[1]);
-    quit = false;
-    pixels = (uint32_t *) malloc(w * h * sizeof(uint32_t));
-    if (pixels == NULL) {
+    fprintf(stderr, "Window size: %d x %d\n", g_backend.window_size[0], g_backend.window_size[1]);
+    fprintf(stderr, "Screen size: %d x %d\n", g_backend.screen_size[0], g_backend.screen_size[1]);
+    g_backend.quit = false;
+    g_backend.pixels = (uint32_t *) malloc(screen_width * screen_height * sizeof(uint32_t));
+    if (g_backend.pixels == NULL) {
         printf("Failed to allocate memory for pixels\n");
         exit(1);
     }
-    zbuffer = (float *) malloc(w * h * sizeof(float));
-    if (zbuffer == NULL) {
+    g_backend.zbuffer = (float *) malloc(screen_width * screen_height * sizeof(float));
+    if (g_backend.zbuffer == NULL) {
         printf("Failed to allocate memory for zbuffer\n");
         exit(1);
     }
-    memset(pixels, 0, get_screen_width() * get_screen_height() * sizeof(uint32_t));
-    for (int i = screen_size[0] * screen_size[1]; i--;) {
-        zbuffer[i] = FLT_MAX;
+    memset(g_backend.pixels, 0, get_screen_width() * get_screen_height() * sizeof(uint32_t));
+    for (int i = g_backend.screen_size[0] * g_backend.screen_size[1]; i--;) {
+        g_backend.zbuffer[i] = FLT_MAX;
     }
 }
 
@@ -73,7 +70,7 @@ void update_events() {
     while(SDL_PollEvent(&event)) {
         switch(event.type) {
             case SDL_QUIT:
-                quit = true;
+                g_backend.quit = true;
                 break;
             default: break;
         }
@@ -81,28 +78,18 @@ void update_events() {
 }
 
 void update_video() {
-    SDL_UpdateTexture(texture, NULL, pixels, get_screen_width() * sizeof(uint32_t));
-    SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0.0f, NULL, SDL_FLIP_VERTICAL);
-    SDL_RenderPresent(renderer);
+    SDL_UpdateTexture(g_backend.texture, NULL, g_backend.pixels, get_screen_width() * sizeof(uint32_t));
+    SDL_RenderCopyEx(g_backend.renderer, g_backend.texture, NULL, NULL, 0.0f, NULL, SDL_FLIP_VERTICAL);
+    SDL_RenderPresent(g_backend.renderer);
 }
 
 void destroy_video() {
     fprintf(stderr, "Destroying video\n");
-    if (pixels) {
-        free(pixels);
-    }
-    if (zbuffer) {
-        free(zbuffer);
-    }
-    if (texture) {
-        SDL_DestroyTexture(texture);
-    }
-    if (renderer) {
-        SDL_DestroyRenderer(renderer);
-    }
-    if (window) {
-        SDL_DestroyWindow(window);
-    }
+    free(g_backend.pixels);
+    free(g_backend.zbuffer);
+    SDL_DestroyTexture(g_backend.texture);
+    SDL_DestroyRenderer(g_backend.renderer);
+    SDL_DestroyWindow(g_backend.window);
     fprintf(stderr, "Video destroyed successfully\n");
     fprintf(stderr, "Exiting...\n");
     SDL_Quit();
@@ -110,12 +97,12 @@ void destroy_video() {
 }
 
 static void clear_pixel_buffer() {
-    memset(pixels, 0, screen_size[0] * screen_size[1] * sizeof(uint32_t));
+    memset(g_backend.pixels, 0, g_backend.screen_size[0] * g_backend.screen_size[1] * sizeof(uint32_t));
 }
 
 static void clear_zbuffer() {
-    for (int i = screen_size[0] * screen_size[1]; i--;) {
-        zbuffer[i] = -FLT_MAX;
+    for (int i = g_backend.screen_size[0] * g_backend.screen_size[1]; i--;) {
+        g_backend.zbuffer[i] = -FLT_MAX;
     }
 }
 

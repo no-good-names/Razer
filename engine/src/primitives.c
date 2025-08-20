@@ -8,13 +8,53 @@
 
 #include <cglm/cglm.h>
 
-int render_mode = 0;
+struct global_camera_state global_camera;
 
-void draw_pixel(const int32_t x, const int32_t y, const uint32_t color) {
+static int render_mode = 0;
+
+void set_render_mode(int mode) {
+    switch (mode) {
+        case TRIANGLE_WIREFRAME:
+            render_mode = TRIANGLE_WIREFRAME;
+            break;
+        case TRIANGLE_RASTERIZE:
+            render_mode = TRIANGLE_RASTERIZE;
+            break;
+        default: break;
+    }
+}
+
+void world_to_screen(const vec3 v, vec3 out) {
+    out[0] = (v[0] + 1.) * get_screen_width() / 2 + 0.5;
+    out[1] = (v[1] + 1.) * get_screen_height() / 2 + 0.5;
+    out[2] = v[2];
+}
+
+void set_projection(mat4 *projection) {
+    glm_mat4_copy(*projection, global_camera.projection);
+    glm_mat4_mul(global_camera.projection, global_camera.view, global_camera.projection);
+}
+void set_view(mat4 *view) {
+    glm_mat4_copy(*view, global_camera.view);
+    glm_mat4_mul(global_camera.projection, global_camera.view, global_camera.projection);
+}
+
+void draw_2d_pixel(const int32_t x, const int32_t y, const uint32_t color) {
     // Check if x or y is out of bounds
     if (x < 0 || x >= get_screen_width() || y < 0 || y >= get_screen_height())
         return;
-    pixels[(y * get_screen_width()) + x] = color;
+    get_backend_state()->pixels[(y * get_screen_width()) + x] = color;
+}
+
+void draw_3d_pixel(const float x, const float y, const float z, const uint32_t color) {
+    vec3 v;
+    world_to_screen((vec3) {x, y, z}, v);
+    // Check if x or y is out of bounds
+    if (v[0] < 0 || v[0] >= get_screen_width() || v[1] < 0 || v[1] >= get_screen_height())
+        return;
+    if (get_backend_state()->zbuffer[(int)v[1] * get_screen_width() + (int)v[0]] < z) {
+        get_backend_state()->pixels[(int)v[1] * get_screen_width() + (int)v[0]] = color;
+    }
 }
 
 // returns the pixel's value (color 0xRRGGBBAA)
@@ -22,7 +62,7 @@ uint32_t get_pixel(const int32_t x, const int32_t y) {
     // Check if x or y is out of bounds
     if (x < 0 || x >= get_screen_width() || y < 0 || y >= get_screen_height())
         return 0;
-    return pixels[y * get_screen_width() + x];
+    return get_backend_state()->pixels[y * get_screen_width() + x];
 }
 
 void draw_2d_line(int x0, int y0, int x1, int y1, const uint32_t color) {
@@ -44,9 +84,9 @@ void draw_2d_line(int x0, int y0, int x1, int y1, const uint32_t color) {
     int y = y0;
     for (int x = x0; x <= x1; x++) {
         if (steep)
-            draw_pixel(y, x, color);
+            draw_2d_pixel(y, x, color);
         else
-            draw_pixel(x, y, color);
+            draw_2d_pixel(x, y, color);
 
         error2 += derror2;
         if (error2 > dx) {
@@ -56,10 +96,39 @@ void draw_2d_line(int x0, int y0, int x1, int y1, const uint32_t color) {
     }
 }
 
-void world_to_screen(const vec3 v, vec3 out) {
-    out[0] = (v[0] + 1.) * screen_size[0] / 2 + 0.5;
-    out[1] = (v[1] + 1.) * screen_size[1] / 2 + 0.5;
-    out[2] = v[2];
+// TODO: Fix and make line in world space
+void draw_3d_line(vec3 a, vec3 b, uint32_t color) {
+    vec3 p0, p1;
+    world_to_screen(a, p0);
+    world_to_screen(b, p1);
+    bool steep = false;
+    if (fabsf(p1[0] - p0[1]) < fabsf(p0[1] - p1[1])) {
+        glm_swapf(&p0[0], &p0[0]);
+        glm_swapf(&p1[1], &p1[1]);
+        steep = true;
+    }
+    if (p0[0] > p1[0]) {
+        glm_swapf(&p0[0], &p1[0]);
+        glm_swapf(&p0[1], &p1[1]);
+    }
+
+    const int dx = &p1[0] - &p0[0];
+    const int dy = &p1[1] - &p0[1];
+    const int derror2 = abs(dy) * 2;
+    int error2 = 0;
+    int y = p0[1];
+    for (int x = p0[0]; x <= p1[0]; x++) {
+        if (steep)
+            draw_2d_pixel(y, x, color);
+        else
+            draw_2d_pixel(x, y, color);
+
+        error2 += derror2;
+        if (error2 > dx) {
+            y += (p1[1] > p0[1]) ? 1 : -1;
+            error2 -= dx * 2;
+        }
+    }
 }
 
 void barycentric(vec3 A, vec3 B, vec3 C, vec3 P, vec3 out) {
@@ -85,7 +154,7 @@ void barycentric(vec3 A, vec3 B, vec3 C, vec3 P, vec3 out) {
 void rasterized_triangle(vec3 *pts, const uint32_t color) {
     vec2 bboxmin = {  FLT_MAX,  FLT_MAX };
     vec2 bboxmax = { -FLT_MAX, -FLT_MAX };
-    const vec2 clamp = {(float)screen_size[0]-1, (float)screen_size[1]-1};
+    const vec2 clamp = {get_screen_width()-1, get_screen_height()-1};
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j<2; j++) {
             bboxmin[j] = glm_max(0.0f, glm_min(bboxmin[j], pts[i][j]));
@@ -100,10 +169,12 @@ void rasterized_triangle(vec3 *pts, const uint32_t color) {
             if (bc_screen[0] < 0 || bc_screen[1] < 0 || bc_screen[2] < 0) continue;
             P[2] = 0;
             for (int i = 0; i<3; i++) P[2] += pts[i][2]*bc_screen[i];
-            if (zbuffer[((int)P[0]+((int)P[1]*screen_size[0]))] < P[2]) {
-                zbuffer[((int)P[0]+((int)P[1]*screen_size[0]))] = P[2];
+
+            if (get_backend_state()->zbuffer[((int)P[0]+((int)P[1]*get_backend_state()->screen_size[0]))] < P[2]) {
+                get_backend_state()->zbuffer[((int)P[0]+((int)P[1]*get_backend_state()->screen_size[0]))] = P[2];
                 // replace with shader stuff
-                draw_pixel((int32_t)P[0], (int32_t)P[1], color);
+                if (color > get_backend_state()->zbuffer[((int)P[0]+((int)P[1]*get_backend_state()->screen_size[0]))])
+                draw_2d_pixel((int32_t)P[0], (int32_t)P[1], color);
             }
         }
     }
@@ -111,17 +182,17 @@ void rasterized_triangle(vec3 *pts, const uint32_t color) {
 
 
 // TODO: Replace 2D lines with 3D space lines
-void wireframe_triangle(const vec3 *pts, const uint32_t color) {
-    draw_2d_line((int)pts[0][0], (int)pts[0][1],
-              (int)pts[1][0], (int)pts[1][1], color);
+void wireframe_triangle(vec3 *pts, const uint32_t color) {
+    draw_3d_line(pts[0],
+              pts[1], color);
+    draw_3d_line(pts[1],
+              pts[2], color);
 
-    draw_2d_line((int)pts[1][0], (int)pts[1][1],
-              (int)pts[2][0], (int)pts[2][1], color);
-
-    draw_2d_line((int)pts[2][0], (int)pts[2][1],
-              (int)pts[0][0], (int)pts[0][1], color);
+    draw_3d_line(pts[2],
+              pts[0], color);
 }
 
+// TODO: Implement the global camera
 void render_triangle(const vec3 *v, ivec3 *f, const int nFaces, const uint32_t *colors) {
     for (int i = 0; i<nFaces; i++) {
         ivec3 face;
